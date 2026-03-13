@@ -1,0 +1,386 @@
+:root {
+  font-family: "Unbounded", sans-serif;
+  color: #0b0b0b;
+  background-color: #f2efe9;
+  line-height: 1.4;
+  font-weight: 300;
+  --neutral-900: #111111;
+  --neutral-700: #3c3c3c;
+  --neutral-500: #6b6b6b;
+  --neutral-100: #f7f4ee;
+  --exercise: #d43f3f;
+  --rest: #3d9b5f;
+  --idle: #e4ddcf;
+  --panel-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #faf8f2 0%, #efe8dd 45%, #ded6c6 100%);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 4vw, 3.8rem);
+  letter-spacing: -0.03em;
+}
+
+.kicker {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  color: var(--neutral-500);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.status-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--neutral-100);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}
+
+.status-pill.running {
+  background: #e8f5ee;
+}
+
+.status-pill.paused {
+  background: #ffe9c2;
+}
+
+.status-pill.stopped,
+.status-pill.idle {
+  background: #f3d5d5;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.top-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.panel {
+  border-radius: 32px;
+  padding: 32px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 380px;
+  box-shadow: var(--panel-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.2), transparent 45%);
+  pointer-events: none;
+}
+
+.panel.exercise {
+  background: linear-gradient(135deg, #e14b4b 0%, #b62b2b 100%);
+}
+
+.panel.rest {
+  background: linear-gradient(135deg, #51b477 0%, #2e7c49 100%);
+}
+
+.panel.idle {
+  background: linear-gradient(135deg, #bcae98 0%, #8d7e68 100%);
+}
+
+.label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.panel-content {
+  min-height: 220px;
+}
+
+.panel h2 {
+  margin: 12px 0 18px;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.15;
+  min-height: 2.6em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sub-message {
+  margin: 0 0 18px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  min-height: 3.2em;
+}
+
+.timer {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: clamp(4rem, 7vw, 6.5rem);
+  letter-spacing: 0.05em;
+}
+
+.panel-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 1;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.timing-card {
+  height: 100%;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card h3 {
+  margin: 0 0 12px;
+}
+
+.field-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--neutral-700);
+}
+
+input[type="number"] {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #d3c9b7;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+.inline {
+  margin-top: 12px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.toggle {
+  margin-top: 12px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.group-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.group-list li {
+  cursor: grab;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f7f4ee;
+}
+
+.group-info {
+  display: flex;
+  gap: 12px;
+}
+
+.group-name {
+  margin: 0 0 4px;
+  font-weight: 500;
+}
+
+.group-desc {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--neutral-500);
+}
+
+.hint {
+  margin: 0 0 12px;
+  color: var(--neutral-500);
+  font-size: 0.8rem;
+}
+
+.columns {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.column {
+  background: #f7f4ee;
+  border-radius: 16px;
+  padding: 12px;
+  min-height: 220px;
+}
+
+.column-title {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--neutral-500);
+}
+
+@media (max-width: 980px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .top-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    min-height: 360px;
+  }
+
+  .columns {
+    grid-template-columns: 1fr;
+  }
+}
+.panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 1;
+}
+
+.icon-button {
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button.primary {
+  width: 52px;
+  height: 52px;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.icon-button svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.icon-button.primary svg {
+  width: 26px;
+  height: 26px;
+}
+
+.timing-card .panel-controls {
+  margin-bottom: 10px;
+}
+
+.timing-card .icon-button {
+  background: #efe6d8;
+  color: var(--neutral-900);
+}
+
+.timing-card .icon-button.primary {
+  background: #d8ccb8;
+}
+
+.timing-card .icon-button:hover {
+  background: #e0d5c4;
+}
+
+.icon-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.3);
+}
