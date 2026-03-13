@@ -314,6 +314,22 @@ select {
   color: var(--neutral-900);
 }
 
+.pill.needed {
+  background: #e5f4e8;
+  border-color: #6fa17a;
+  color: #1f5f31;
+}
+
+.pill.active.needed {
+  background: #cfe8d4;
+  border-color: #4f8a5d;
+  color: #184925;
+}
+
+.pill.needed input {
+  accent-color: #2e7c49;
+}
+
 .planned-group {
   display: block;
   font-size: 0.75rem;

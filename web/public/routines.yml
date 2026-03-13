@@ -1,8 +1,12 @@
-running_1:
-  - name: "Running Injury Prevention"
-    movement_groups: ["posterior_chain_strength", "knee_stability"]
+running_1::
+  - name: "Runners Full Body Resilience"
+    movement_groups:
+      - core_stability
+      - knee_strength
+      - ankle_stability
+      - upper_back_strength
+      - hip_mobility
+      - core_strength
+      - knee_stability
+      - posterior_chain_strength
     rotations: 3
-running_2:
-  - name: "Runners Strength"
-    movement_groups: ["knee_strength", "posterior_chain_strength"]
-    rotations: 2
