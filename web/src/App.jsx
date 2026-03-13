@@ -191,6 +191,7 @@ export default function App() {
 
   const currentStep = steps[stepIndex] ?? null;
   const isLocked = status === "running";
+  const isRunning = status === "running";
 
   useEffect(() => {
     if (status === "running") return;
@@ -387,9 +388,28 @@ export default function App() {
         <section className="top-grid">
           <div className={backgroundClass}>
             <div className="panel-content">
-              <h2>{stepHeadline}</h2>
-              <p className="sub-message">{stepSub}</p>
-              <div className="timer">{remainingDisplay}</div>
+              {isRunning ? (
+                <>
+                  <h2>{stepHeadline}</h2>
+                  <p className="sub-message">{stepSub}</p>
+                  <div className="timer">{remainingDisplay}</div>
+                </>
+              ) : (
+                <div className="planned">
+                  <p className="label">Planned movements</p>
+                  {routine.length > 0 ? (
+                    <ol className="planned-list">
+                      {routine.map((movement, index) => (
+                        <li key={`${movement.name}-${index}`} className="planned-item">
+                          {movement.name}
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="planned-empty">Build your routine to see the movement list.</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
