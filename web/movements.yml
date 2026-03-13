@@ -1,5 +1,5 @@
 barbell_back_squat:
-  - name: Barbell Back Squat
+  - name: Bar Back Squat
     category: knee_strength
     category_name: Knee Strength
     side: false
@@ -14,7 +14,7 @@ bird_dog:
     cues: Alternate opposite arm and leg, keep your hips level, and reach long rather than lifting high.
 
 bulgarian_split_barbell:
-  - name: Barbell Bulgarian Split Squat
+  - name: Bar Bulgarian Split Squat
     category: knee_stability
     category_name: Knee Stability
     side: true
@@ -22,7 +22,7 @@ bulgarian_split_barbell:
     cues: Set the bar across your upper back, keep your torso quiet, and complete all reps on one leg before changing sides.
 
 bulgarian_split_bodyweight:
-  - name: Bodyweight Bulgarian Split Squat
+  - name: Bulgarian Split Squat
     category: knee_stability
     category_name: Knee Stability
     side: true
@@ -30,7 +30,7 @@ bulgarian_split_bodyweight:
     cues: Rear foot elevated, front shin mostly vertical, and finish all reps on one side before switching.
 
 bulgarian_split_dumbbell:
-  - name: Dumbbell Bulgarian Split Squat
+  - name: DB Bulgarian Split Squat
     category: knee_stability
     category_name: Knee Stability
     side: true
@@ -38,7 +38,7 @@ bulgarian_split_dumbbell:
     cues: Hold one dumbbell in the hand opposite the front leg, move slowly on the way down, and finish one side before switching.
 
 bulgarian_split_kettlebell:
-  - name: Kettlebell Bulgarian Split Squat
+  - name: KB Bulgarian Split Squat
     category: knee_stability
     category_name: Knee Stability
     side: true
@@ -53,7 +53,7 @@ dead_bug:
     cues: Alternate opposite arm and leg, press your lower back into the floor, and move slowly enough that nothing shifts.
 
 deadlift_barbell:
-  - name: Barbell Deadlift
+  - name: Bar Deadlift
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
@@ -61,14 +61,14 @@ deadlift_barbell:
     cues: Set the bar over mid-foot, pull the slack out first, and drive through the floor while keeping the bar close.
 
 deadlift_bodyweight:
-  - name: Bodyweight Hinge
+  - name: Hinge
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
     cues: Hinge at the hips, keep your back flat, and load the hamstrings before standing tall.
 
 deadlift_dumbbell:
-  - name: Dumbbell Deadlift
+  - name: DB Deadlift
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
@@ -76,7 +76,7 @@ deadlift_dumbbell:
     cues: Hold a dumbbell in each hand at your sides, keep them close to your legs, and stand tall without shrugging.
 
 deadlift_kettlebell:
-  - name: Kettlebell Deadlift
+  - name: KB Deadlift
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
@@ -91,7 +91,7 @@ glute_bridge:
     cues: Drive through the heels, squeeze the glutes at the top, and avoid arching the lower back.
 
 glute_bridge_dumbbell:
-  - name: Dumbbell Glute Bridge
+  - name: DB Glute Bridge
     category: hip_mobility
     category_name: Hip Mobility
     side: false
@@ -99,7 +99,7 @@ glute_bridge_dumbbell:
     cues: Rest the dumbbell horizontally across the hips, keep the ribs down, and squeeze hard at the top.
 
 glute_bridge_kettlebell:
-  - name: Kettlebell Glute Bridge
+  - name: KB Glute Bridge
     category: hip_mobility
     category_name: Hip Mobility
     side: false
@@ -107,7 +107,7 @@ glute_bridge_kettlebell:
     cues: Rest the kettlebell across the hips, pin it in place with your hands, and drive straight up through the heels.
 
 goblet_squat_dumbbell:
-  - name: Dumbbell Goblet Squat
+  - name: DB Goblet Squat
     category: knee_strength
     category_name: Knee Strength
     side: false
@@ -115,7 +115,7 @@ goblet_squat_dumbbell:
     cues: Hold one dumbbell vertically at your chest in a goblet position, keep the load close, and drive up through the whole foot.
 
 goblet_squat_kettlebell:
-  - name: Kettlebell Goblet Squat
+  - name: KB Goblet Squat
     category: knee_strength
     category_name: Knee Strength
     side: false
@@ -180,7 +180,7 @@ push_up:
     cues: Hands just outside shoulder width, body rigid from head to heel, and lower under control.
 
 rdl_barbell:
-  - name: Barbell Romanian Deadlift
+  - name: Bar Romanian Deadlift
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
@@ -188,14 +188,14 @@ rdl_barbell:
     cues: Hold the bar in your hands, unlock the knees, push the hips back, and keep the lats tight the whole rep.
 
 rdl_bodyweight:
-  - name: Bodyweight Romanian Deadlift
+  - name: Romanian Deadlift
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
     cues: Soft bend in the knees, push the hips back, and stop when the hamstrings are fully loaded.
 
 rdl_dumbbell:
-  - name: Dumbbell Romanian Deadlift
+  - name: DB Romanian Deadlift
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
@@ -203,7 +203,7 @@ rdl_dumbbell:
     cues: Hold a dumbbell in each hand at your sides, slide them down the thighs, and return once the hamstrings are loaded.
 
 rdl_kettlebell:
-  - name: Kettlebell Romanian Deadlift
+  - name: KB Romanian Deadlift
     category: posterior_chain_strength
     category_name: Posterior Chain Strength
     side: false
@@ -211,7 +211,7 @@ rdl_kettlebell:
     cues: Hold the kettlebell with both hands in front of you, keep it close, and reach the hips back without rounding.
 
 reverse_lunge_barbell:
-  - name: Barbell Reverse Lunge
+  - name: Bar Reverse Lunge
     category: knee_stability
     category_name: Knee Stability
     side: false
@@ -219,14 +219,14 @@ reverse_lunge_barbell:
     cues: Keep the bar on your upper back, alternate sides rep to rep, and stay upright as you step back.
 
 reverse_lunge_bodyweight:
-  - name: Bodyweight Reverse Lunge
+  - name: Reverse Lunge
     category: knee_stability
     category_name: Knee Stability
     side: false
     cues: Alternate sides rep to rep, step back with control, and keep the front knee tracking over the foot.
 
 reverse_lunge_dumbbell:
-  - name: Dumbbell Reverse Lunge
+  - name: DB Reverse Lunge
     category: knee_stability
     category_name: Knee Stability
     side: false
@@ -234,7 +234,7 @@ reverse_lunge_dumbbell:
     cues: Alternate sides rep to rep while holding one dumbbell in the hand opposite the front leg for each rep.
 
 reverse_lunge_kettlebell:
-  - name: Kettlebell Reverse Lunge
+  - name: KB Reverse Lunge
     category: knee_stability
     category_name: Knee Stability
     side: false
@@ -242,7 +242,7 @@ reverse_lunge_kettlebell:
     cues: Alternate sides rep to rep while holding one kettlebell in the hand opposite the front leg for each rep.
 
 single_arm_row_dumbbell:
-  - name: Single Arm Dumbbell Row
+  - name: Single Arm DB Row
     category: upper_back_strength
     category_name: Upper Back Strength
     side: true
@@ -250,7 +250,7 @@ single_arm_row_dumbbell:
     cues: Brace with the free hand on your thigh or a bench, drive the elbow back, and finish one side before switching.
 
 single_arm_row_kettlebell:
-  - name: Single Arm Kettlebell Row
+  - name: Single Arm KB Row
     category: upper_back_strength
     category_name: Upper Back Strength
     side: true
@@ -287,7 +287,7 @@ single_leg_pogos:
     cues: Minimal knee bend, stay stiff through the ankle, and complete one side before switching.
 
 squat_bodyweight:
-  - name: Bodyweight Squat
+  - name: Squat
     category: knee_strength
     category_name: Knee Strength
     side: false
@@ -301,7 +301,7 @@ squat_jump:
     cues: Load through the hips, explode vertically, and land softly with bent knees so you absorb the landing.
 
 step_up_bodyweight:
-  - name: Bodyweight Step Up
+  - name: Step Up
     category: knee_strength
     category_name: Knee Strength
     side: true
@@ -309,7 +309,7 @@ step_up_bodyweight:
     cues: Complete one side before switching, drive through the heel of the top leg, and do not push off the floor.
 
 step_up_dumbbell:
-  - name: Dumbbell Step Up
+  - name: DB Step Up
     category: knee_strength
     category_name: Knee Strength
     side: true
@@ -317,7 +317,7 @@ step_up_dumbbell:
     cues: Hold one dumbbell in the hand opposite the working leg, control the lowering phase, and switch sides only after the set.
 
 step_up_kettlebell:
-  - name: Kettlebell Step Up
+  - name: KB Step Up
     category: knee_strength
     category_name: Knee Strength
     side: true
@@ -325,7 +325,7 @@ step_up_kettlebell:
     cues: Hold one kettlebell in the hand opposite the working leg, stay tall, and make the top leg do the work.
 
 touchdown_squat_bodyweight:
-  - name: Bodyweight Touchdown Squat
+  - name: Touchdown Squat
     category: knee_stability
     category_name: Knee Stability
     side: true
@@ -333,7 +333,7 @@ touchdown_squat_bodyweight:
     cues: Tap the heel lightly to the box, keep the working knee tracking out, and finish one side before switching.
 
 touchdown_squat_dumbbell:
-  - name: Dumbbell Touchdown Squat
+  - name: DB Touchdown Squat
     category: knee_stability
     category_name: Knee Stability
     side: true
@@ -341,7 +341,7 @@ touchdown_squat_dumbbell:
     cues: Hold one dumbbell in the hand opposite the working leg, control the descent, and switch sides after the set.
 
 touchdown_squat_kettlebell:
-  - name: Kettlebell Touchdown Squat
+  - name: KB Touchdown Squat
     category: knee_stability
     category_name: Knee Stability
     side: true
