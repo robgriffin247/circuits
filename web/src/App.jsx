@@ -4,7 +4,13 @@ import { load as loadYaml } from "js-yaml";
 const DEFAULT_START_DURATION = 10;
 const DEFAULT_MOVE_DURATION = 45;
 const DEFAULT_REST_DURATION = 30;
-const DEFAULT_ROTATIONS = 3;
+
+const EQUIPMENT_OPTIONS = [
+  { id: "large_kettlebell", label: "Kettlebell (L)" },
+  { id: "small_kettlebell", label: "Kettlebell (S)" },
+  { id: "dumbbell", label: "Dumbbells" },
+  { id: "olympic_bar", label: "Barbell" }
+];
 
 const STEP_TYPES = {
   start: "start",
@@ -12,51 +18,84 @@ const STEP_TYPES = {
   rest: "rest"
 };
 
-function shuffleIds(ids) {
-  const next = [...ids];
-  for (let i = next.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [next[i], next[j]] = [next[j], next[i]];
-  }
-  return next;
+function buildMovementGroups(raw) {
+  return Object.entries(raw ?? {}).map(([id, value]) => {
+    const entry = Array.isArray(value) ? value[0] : value;
+    return {
+      id,
+      name: entry?.name ?? id,
+      movements: entry?.movements ?? []
+    };
+  });
 }
 
-function buildRoutine(groups, selectedGroupIds, startWithStrength) {
-  const selectedGroups = selectedGroupIds
-    .map((id) => groups.find((group) => group.id === id))
-    .filter(Boolean);
+function buildRoutines(raw) {
+  return Object.entries(raw ?? {}).map(([id, value]) => {
+    const entry = Array.isArray(value) ? value[0] : value;
+    return {
+      id,
+      name: entry?.name ?? id,
+      movementGroups: entry?.movement_groups ?? [],
+      rotations: Number(entry?.rotations ?? 1)
+    };
+  });
+}
 
-  const routine = [];
-  let useStrength = startWithStrength;
+function randomPick(list) {
+  if (!list || list.length === 0) return null;
+  return list[Math.floor(Math.random() * list.length)];
+}
 
-  for (const group of selectedGroups) {
-    const bucket = useStrength ? group.exercises.strength : group.exercises.stability;
-    if (bucket && bucket.length > 0) {
-      routine.push({
-        name: bucket[0].name,
-        cues: bucket[0].cues ?? ""
-      });
+function buildPlan(groupsById, groupOrder, equipmentSet) {
+  return groupOrder.map((groupId) => {
+    const group = groupsById[groupId];
+    if (!group) {
+      return {
+        groupId,
+        groupName: "Unknown group",
+        movement: null,
+        reason: "Group not found"
+      };
     }
-    useStrength = !useStrength;
+
+    const matching = (group.movements ?? []).filter((movement) => {
+      const equipment = movement.equipment ?? [];
+      return equipment.some((item) => equipmentSet.has(item));
+    });
+
+    if (matching.length === 0) {
+      return {
+        groupId,
+        groupName: group.name,
+        movement: null,
+        reason: "No matching equipment"
+      };
+    }
+
+    return {
+      groupId,
+      groupName: group.name,
+      movement: randomPick(matching),
+      reason: ""
+    };
+  });
+}
+
+function findNextExercise(steps, startIndex) {
+  for (let i = startIndex + 1; i < steps.length; i += 1) {
+    const step = steps[i];
+    if (step.type === STEP_TYPES.exercise) {
+      return step.headline;
+    }
   }
-
-  return routine;
+  return "Finished";
 }
 
-function formatUpNext(nextMovement) {
-  if (!nextMovement) return "Up next: Finished!";
-  return `Up next: ${nextMovement.name}`;
-}
-
-function formatCues(movement) {
-  if (!movement || !movement.cues) return "Cues: move with control.";
-  return movement.cues;
-}
-
-function buildSteps(routine, durations, rotations) {
+function buildSteps(plan, durations, rotations) {
+  const movements = plan.filter((item) => item.movement).map((item) => item.movement);
   const steps = [];
   const startMessage =
-    routine.length > 0 ? `Coming up: ${routine[0].name}` : "Coming up: Build your routine";
+    movements.length > 0 ? `Coming up: ${movements[0].name}` : "Coming up: Build your routine";
 
   steps.push({
     type: STEP_TYPES.start,
@@ -66,23 +105,26 @@ function buildSteps(routine, durations, rotations) {
   });
 
   for (let rotation = 0; rotation < rotations; rotation += 1) {
-    for (let i = 0; i < routine.length; i += 1) {
-      const movement = routine[i];
-      const nextMovement = routine[i + 1] ?? (rotation + 1 < rotations ? routine[0] : null);
+    for (let i = 0; i < movements.length; i += 1) {
+      const movement = movements[i];
+      const isLastMovement = rotation === rotations - 1 && i === movements.length - 1;
+      const nextMovement = movements[i + 1] ?? (rotation + 1 < rotations ? movements[0] : null);
       steps.push({
         type: STEP_TYPES.exercise,
         headline: movement.name,
-        subMessage: formatCues(movement),
+        subMessage: movement.cues ?? "",
         duration: durations.move,
         movement
       });
 
-      steps.push({
-        type: STEP_TYPES.rest,
-        headline: "Rest",
-        subMessage: formatUpNext(nextMovement),
-        duration: durations.rest
-      });
+      if (!isLastMovement) {
+        steps.push({
+          type: STEP_TYPES.rest,
+          headline: "Rest",
+          subMessage: nextMovement ? `Up next: ${nextMovement.name}` : "Up next: Finished!",
+          duration: durations.rest
+        });
+      }
     }
   }
 
@@ -143,17 +185,25 @@ function formatDuration(value) {
 }
 
 export default function App() {
-  const [groups, setGroups] = useState([]);
-  const [selectedGroupIds, setSelectedGroupIds] = useState([]);
-  const [availableGroupIds, setAvailableGroupIds] = useState([]);
+  const [movementGroups, setMovementGroups] = useState([]);
+  const [routines, setRoutines] = useState([]);
+  const [selectedRoutineId, setSelectedRoutineId] = useState("");
+  const [equipment, setEquipment] = useState(() =>
+    EQUIPMENT_OPTIONS.reduce(
+      (acc, item) => ({
+        ...acc,
+        [item.id]: item.id !== "olympic_bar"
+      }),
+      {}
+    )
+  );
   const [durations, setDurations] = useState({
     start: DEFAULT_START_DURATION,
     move: DEFAULT_MOVE_DURATION,
     rest: DEFAULT_REST_DURATION
   });
-  const [rotations, setRotations] = useState(DEFAULT_ROTATIONS);
-  const [startWithStrengthRandom, setStartWithStrengthRandom] = useState(() => Math.random() < 0.5);
-  const [routine, setRoutine] = useState([]);
+  const [rotations, setRotations] = useState(1);
+  const [plan, setPlan] = useState([]);
   const [steps, setSteps] = useState([]);
   const [stepIndex, setStepIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
@@ -161,41 +211,70 @@ export default function App() {
   const { shortBeep, longBeep, resume } = useBeep();
   const intervalRef = useRef(null);
   const advancePendingRef = useRef(false);
-  const dragRef = useRef(null);
   const endTimeRef = useRef(null);
   const lastRemainingRef = useRef(null);
 
   useEffect(() => {
-    fetch("/exercises.yml")
-      .then((res) => res.text())
-      .then((text) => {
-        const parsed = loadYaml(text);
-        const groupList = parsed?.groups ?? [];
-        setGroups(groupList);
-        setSelectedGroupIds(shuffleIds(groupList.map((group) => group.id)));
-        setAvailableGroupIds([]);
-        setStartWithStrengthRandom(Math.random() < 0.5);
+    Promise.all([fetch("/movements.yml"), fetch("/routines.yml")])
+      .then(async ([movementsRes, routinesRes]) => {
+        const movementsText = await movementsRes.text();
+        const routinesText = await routinesRes.text();
+        const movementGroupsList = buildMovementGroups(loadYaml(movementsText));
+        const routinesList = buildRoutines(loadYaml(routinesText));
+        setMovementGroups(movementGroupsList);
+        setRoutines(routinesList);
+        if (routinesList.length > 0) {
+          setSelectedRoutineId(routinesList[0].id);
+        }
       })
       .catch(() => {
-        setGroups([]);
-        setSelectedGroupIds([]);
-        setAvailableGroupIds([]);
+        setMovementGroups([]);
+        setRoutines([]);
       });
   }, []);
 
+  const routine = useMemo(
+    () => routines.find((entry) => entry.id === selectedRoutineId) ?? null,
+    [routines, selectedRoutineId]
+  );
+
+  const groupsById = useMemo(() => {
+    return movementGroups.reduce((acc, group) => {
+      acc[group.id] = group;
+      return acc;
+    }, {});
+  }, [movementGroups]);
+
+  const equipmentSet = useMemo(() => {
+    const selected = new Set(["bodyweight"]);
+    Object.entries(equipment).forEach(([key, value]) => {
+      if (value) selected.add(key);
+    });
+    return selected;
+  }, [equipment]);
+
   useEffect(() => {
-    setRoutine(buildRoutine(groups, selectedGroupIds, startWithStrengthRandom));
-  }, [groups, selectedGroupIds, startWithStrengthRandom]);
+    if (!routine) return;
+    setRotations(routine.rotations);
+  }, [routine]);
 
-  const unselectedGroupIds = availableGroupIds;
-
-  const currentStep = steps[stepIndex] ?? null;
-  const isLocked = status === "running";
-  const isRunning = status === "running";
+  const regeneratePlan = () => {
+    if (!routine) {
+      setPlan([]);
+      return;
+    }
+    const nextPlan = buildPlan(groupsById, routine.movementGroups, equipmentSet);
+    setPlan(nextPlan);
+  };
 
   useEffect(() => {
     if (status === "running") return;
-    const nextSteps = buildSteps(routine, durations, rotations);
+    regeneratePlan();
+  }, [routine, groupsById, equipmentSet, status]);
+
+  useEffect(() => {
+    if (status === "running") return;
+    const nextSteps = buildSteps(plan, durations, rotations);
     const nextIndex = Math.min(stepIndex, Math.max(nextSteps.length - 1, 0));
     setSteps(nextSteps);
 
@@ -208,7 +287,7 @@ export default function App() {
     if (status !== "paused") {
       setTimeRemaining(nextSteps[nextIndex]?.duration ?? 0);
     }
-  }, [routine, durations, rotations, status, stepIndex]);
+  }, [plan, durations, rotations, status, stepIndex]);
 
   const clearIntervalTimer = () => {
     if (intervalRef.current) {
@@ -218,17 +297,12 @@ export default function App() {
   };
 
   const initializeTimer = () => {
-    const randomStart = Math.random() < 0.5;
-    const nextRoutine = buildRoutine(groups, selectedGroupIds, randomStart);
-    setStartWithStrengthRandom(randomStart);
-    setRoutine(nextRoutine);
-    const nextSteps = buildSteps(nextRoutine, durations, rotations);
-    setSteps(nextSteps);
+    if (plan.length === 0 || steps.length === 0) return;
     setStepIndex(0);
-    setTimeRemaining(nextSteps[0]?.duration ?? 0);
+    setTimeRemaining(steps[0]?.duration ?? 0);
     setStatus("running");
     advancePendingRef.current = false;
-    endTimeRef.current = performance.now() + (nextSteps[0]?.duration ?? 0) * 1000;
+    endTimeRef.current = performance.now() + (steps[0]?.duration ?? 0) * 1000;
     lastRemainingRef.current = null;
   };
 
@@ -273,6 +347,17 @@ export default function App() {
     initializeTimer();
   };
 
+  const handleStartOver = () => {
+    clearIntervalTimer();
+    setStatus("idle");
+    setTimeRemaining(0);
+    setStepIndex(0);
+    advancePendingRef.current = false;
+    endTimeRef.current = null;
+    lastRemainingRef.current = null;
+    regeneratePlan();
+  };
+
   const handleSkip = (direction) => {
     if (steps.length === 0) return;
     const nextIndex = Math.min(Math.max(stepIndex + direction, 0), steps.length - 1);
@@ -295,10 +380,7 @@ export default function App() {
       }
       intervalRef.current = setInterval(() => {
         const now = performance.now();
-        const remaining = Math.max(
-          0,
-          Math.ceil((endTimeRef.current - now) / 1000)
-        );
+        const remaining = Math.max(0, Math.ceil((endTimeRef.current - now) / 1000));
         if (lastRemainingRef.current !== remaining) {
           if ([3, 2, 1].includes(remaining)) {
             shortBeep();
@@ -332,8 +414,26 @@ export default function App() {
   }, [status, steps, timeRemaining, shortBeep, longBeep]);
 
   const remainingDisplay = formatDuration(timeRemaining);
+  const currentStep = steps[stepIndex] ?? null;
   const stepHeadline = currentStep?.headline ?? "Ready";
-  const stepSub = currentStep?.subMessage ?? "Set your timing and target areas.";
+  const isLocked = status === "running" || status === "paused";
+  const isRunning = status === "running";
+  const missingMovements = plan.filter((item) => !item.movement);
+  const hasMovements = plan.some((item) => item.movement);
+  const nextExerciseName = isRunning ? findNextExercise(steps, stepIndex) : "";
+  const runningSubMessage =
+    currentStep?.type === STEP_TYPES.exercise
+      ? currentStep?.subMessage
+      : `Next: ${nextExerciseName}`;
+  const totalDuration = steps.reduce((total, step) => total + (step.duration ?? 0), 0);
+  const elapsedBeforeCurrent = steps
+    .slice(0, stepIndex)
+    .reduce((total, step) => total + (step.duration ?? 0), 0);
+  const currentDuration = currentStep?.duration ?? 0;
+  const isActive = status === "running" || status === "paused";
+  const currentElapsed = isActive ? Math.max(currentDuration - timeRemaining, 0) : 0;
+  const progressValue =
+    totalDuration > 0 ? (elapsedBeforeCurrent + currentElapsed) / totalDuration : 0;
 
   const backgroundClass = isRunning
     ? currentStep?.type === STEP_TYPES.exercise
@@ -343,143 +443,63 @@ export default function App() {
         : "panel idle"
     : "panel idle";
 
-  const handleDragStart = (groupId, from) => {
-    dragRef.current = { groupId, from };
-  };
-
-  const handleDrop = (to, index) => {
-    if (!dragRef.current) return;
-    const { groupId, from } = dragRef.current;
-    dragRef.current = null;
-
-    if (from === to) {
-      const list = from === "selected" ? selectedGroupIds : availableGroupIds;
-      const fromIndex = list.indexOf(groupId);
-      if (fromIndex === -1) return;
-      const next = [...list];
-      next.splice(fromIndex, 1);
-      const targetIndex = Math.min(Math.max(index, 0), next.length);
-      next.splice(targetIndex, 0, groupId);
-      if (to === "selected") {
-        setSelectedGroupIds(next);
-      } else {
-        setAvailableGroupIds(next);
-      }
-      return;
-    }
-
-    if (to === "selected") {
-      const nextSelected = [...selectedGroupIds];
-      const targetIndex = Math.min(Math.max(index, 0), nextSelected.length);
-      if (!nextSelected.includes(groupId)) {
-        nextSelected.splice(targetIndex, 0, groupId);
-        setSelectedGroupIds(nextSelected);
-      }
-      setAvailableGroupIds((prev) => prev.filter((id) => id !== groupId));
-      return;
-    }
-
-    if (!availableGroupIds.includes(groupId)) {
-      const nextAvailable = [...availableGroupIds];
-      const targetIndex = Math.min(Math.max(index, 0), nextAvailable.length);
-      nextAvailable.splice(targetIndex, 0, groupId);
-      setAvailableGroupIds(nextAvailable);
-    }
-    setSelectedGroupIds((prev) => prev.filter((id) => id !== groupId));
-  };
-
-  const moveToSelected = (groupId) => {
-    if (selectedGroupIds.includes(groupId)) return;
-    setSelectedGroupIds((prev) => [...prev, groupId]);
-    setAvailableGroupIds((prev) => prev.filter((id) => id !== groupId));
-  };
-
-  const moveToAvailable = (groupId) => {
-    if (availableGroupIds.includes(groupId)) return;
-    setAvailableGroupIds((prev) => [...prev, groupId]);
-    setSelectedGroupIds((prev) => prev.filter((id) => id !== groupId));
-  };
-
-  const moveSelected = (groupId, direction) => {
-    const index = selectedGroupIds.indexOf(groupId);
-    if (index === -1) return;
-    const nextIndex = index + direction;
-    if (nextIndex < 0 || nextIndex >= selectedGroupIds.length) return;
-    const next = [...selectedGroupIds];
-    const [item] = next.splice(index, 1);
-    next.splice(nextIndex, 0, item);
-    setSelectedGroupIds(next);
-  };
-
   return (
     <div className="app">
       <header>
         <div>
-          <p className="kicker">Interval Timer</p>
           <h1>Circuits</h1>
+          <p className="kicker">Interval Timer</p>
         </div>
-        <div className="status">
-          <span className={`status-pill ${status}`}>{status.toUpperCase()}</span>
-          <span className="status-meta">{routine.length} moves</span>
-        </div>
+        <div className="status" />
       </header>
 
       <main>
         <section className="top-grid">
-          <div className={backgroundClass}>
-            <div className="panel-content">
-              {isRunning ? (
-                <>
-                  <h2>{stepHeadline}</h2>
-                  <p className="sub-message">{stepSub}</p>
-                  <div className="timer">{remainingDisplay}</div>
-                </>
-              ) : (
-                <div className="planned">
-                  <p className="label">Planned movements</p>
-                  {routine.length > 0 ? (
-                    <ol className="planned-list">
-                      {routine.map((movement, index) => (
-                        <li key={`${movement.name}-${index}`} className="planned-item">
-                          {movement.name}
-                        </li>
-                      ))}
-                    </ol>
-                  ) : (
-                    <p className="planned-empty">Build your routine to see the movement list.</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
           <div className="settings">
-            <div className="card timing-card">
-              <div className="panel-controls">
-                <button className="icon-button" onClick={() => handleSkip(-1)} aria-label="Skip back">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M5 5h2v14H5zM19 6v12l-8.5-6L19 6z" />
-                  </svg>
-                </button>
-                <button
-                  className="icon-button primary"
-                  onClick={handleToggle}
-                  aria-label={status === "running" ? "Pause" : "Play"}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    {status === "running" ? (
-                      <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
-                    ) : (
-                      <path d="M8 5v14l11-7-11-7z" />
-                    )}
-                  </svg>
-                </button>
-                <button className="icon-button" onClick={() => handleSkip(1)} aria-label="Skip forward">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M17 5h2v14h-2zM5 6v12l8.5-6L5 6z" />
-                  </svg>
-                </button>
+            <div className="card">
+              <h3>Routine</h3>
+              <div className="field">
+                <label>
+                  Choose routine
+                  <select
+                    value={selectedRoutineId}
+                    disabled={isLocked}
+                    onChange={(event) => setSelectedRoutineId(event.target.value)}
+                  >
+                    {routines.map((entry) => (
+                      <option key={entry.id} value={entry.id}>
+                        {entry.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
+            </div>
+
+            <div className="card">
+              <h3>Equipment</h3>
+              <p className="hint">Select what you have available to filter movements.</p>
+              <div className="equipment-grid">
+                {EQUIPMENT_OPTIONS.map((item) => (
+                  <label key={item.id} className={`pill ${equipment[item.id] ? "active" : ""}`}>
+                    <input
+                      type="checkbox"
+                      checked={equipment[item.id]}
+                      disabled={isLocked}
+                      onChange={() =>
+                        setEquipment((prev) => ({
+                          ...prev,
+                          [item.id]: !prev[item.id]
+                        }))
+                      }
+                    />
+                    {item.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="card timing-card">
               <h3>Timing</h3>
               <div className="field-grid">
                 <label>
@@ -525,106 +545,84 @@ export default function App() {
               </div>
             </div>
           </div>
-        </section>
 
-        <section className="card">
-          <h3>Target Areas</h3>
-          <p className="hint">Drag groups between columns and reorder the circuit.</p>
-          <div className="columns">
-            <div
-              className="column"
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={() => handleDrop("available", unselectedGroupIds.length)}
-            >
-              <p className="column-title">Available</p>
-              <ul className="group-list">
-                {unselectedGroupIds.map((id, index) => {
-                  const group = groups.find((entry) => entry.id === id);
-                  if (!group) return null;
-                  return (
-                    <li
-                      key={id}
-                      draggable
-                      onDragStart={() => handleDragStart(id, "available")}
-                      onDragOver={(event) => event.preventDefault()}
-                      onDrop={() => handleDrop("available", index)}
-                    >
-                      <div className="group-info">
-                        <div>
-                          <p className="group-name">{group.name}</p>
-                          <p className="group-desc">{group.description}</p>
-                        </div>
-                      </div>
-                      <div className="group-actions">
-                        <button
-                          type="button"
-                          className="mini-button"
-                          onClick={() => moveToSelected(id)}
-                          aria-label={`Add ${group.name} to selected`}
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+          <div className={backgroundClass}>
+            <div className="panel-controls">
+              <button className="icon-button" onClick={() => handleSkip(-1)} aria-label="Skip back">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 5h2v14H5zM19 6v12l-8.5-6L19 6z" />
+                </svg>
+              </button>
+              <button
+                className="icon-button primary"
+                onClick={handleToggle}
+                aria-label={status === "running" ? "Pause" : "Play"}
+                disabled={!hasMovements}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  {status === "running" ? (
+                    <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+                  ) : (
+                    <path d="M8 5v14l11-7-11-7z" />
+                  )}
+                </svg>
+              </button>
+              <button className="icon-button" onClick={() => handleSkip(1)} aria-label="Skip forward">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M17 5h2v14h-2zM5 6v12l8.5-6L5 6z" />
+                </svg>
+              </button>
             </div>
-            <div
-              className="column"
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={() => handleDrop("selected", selectedGroupIds.length)}
-            >
-              <p className="column-title">Selected</p>
-              <ul className="group-list">
-                {selectedGroupIds.map((id, index) => {
-                  const group = groups.find((entry) => entry.id === id);
-                  if (!group) return null;
-                  return (
-                    <li
-                      key={id}
-                      draggable
-                      onDragStart={() => handleDragStart(id, "selected")}
-                      onDragOver={(event) => event.preventDefault()}
-                      onDrop={() => handleDrop("selected", index)}
-                    >
-                      <div className="group-info">
-                        <div>
-                          <p className="group-name">{group.name}</p>
-                          <p className="group-desc">{group.description}</p>
-                        </div>
-                      </div>
-                      <div className="group-actions">
-                        <button
-                          type="button"
-                          className="mini-button"
-                          onClick={() => moveSelected(id, -1)}
-                          aria-label={`Move ${group.name} up`}
-                        >
-                          Up
-                        </button>
-                        <button
-                          type="button"
-                          className="mini-button"
-                          onClick={() => moveSelected(id, 1)}
-                          aria-label={`Move ${group.name} down`}
-                        >
-                          Down
-                        </button>
-                        <button
-                          type="button"
-                          className="mini-button"
-                          onClick={() => moveToAvailable(id)}
-                          aria-label={`Remove ${group.name} from selected`}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+            <div className="panel-content">
+              {isRunning ? (
+                <>
+                  <p className="label">Now</p>
+                  <h2>{stepHeadline}</h2>
+                  {runningSubMessage ? <p className="sub-message">{runningSubMessage}</p> : null}
+                  <div className="timer">{remainingDisplay}</div>
+                  <div
+                    className="progress"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={1}
+                    aria-valuenow={progressValue}
+                  >
+                    <div className="progress-fill" style={{ width: `${Math.min(Math.max(progressValue, 0), 1) * 100}%` }} />
+                  </div>
+                </>
+              ) : (
+                <div className="planned">
+                  <p className="label">Planned movements</p>
+                  {plan.length > 0 ? (
+                    <ol className="planned-list">
+                      {plan.map((item, index) => (
+                        <li key={`${item.groupId}-${index}`} className="planned-item">
+                          {item.movement?.name ?? item.reason}
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="planned-empty">Pick a routine to build your circuit.</p>
+                  )}
+                </div>
+              )}
             </div>
+            {!isRunning && (
+              <div className="panel-footer">
+                {status === "paused" ? (
+                  <button className="ghost-button" type="button" onClick={handleStartOver}>
+                    Start over
+                  </button>
+                ) : (
+                  <button className="ghost-button" type="button" onClick={regeneratePlan}>
+                    Shuffle circuit
+                  </button>
+                )}
+                {missingMovements.length > 0 && (
+                  <p className="warning">Some groups have no matching equipment.</p>
+                )}
+              </div>
+            )}
           </div>
         </section>
       </main>
