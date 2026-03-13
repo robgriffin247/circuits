@@ -6,10 +6,12 @@ const DEFAULT_MOVE_DURATION = 45;
 const DEFAULT_REST_DURATION = 30;
 
 const EQUIPMENT_OPTIONS = [
-  { id: "large_kettlebell", label: "Kettlebell (L)" },
-  { id: "small_kettlebell", label: "Kettlebell (S)" },
-  { id: "dumbbell", label: "Dumbbells" },
-  { id: "olympic_bar", label: "Barbell" }
+  { id: "large_kettlebell", label: "Kettlebell (L)", defaultSelected: true },
+  { id: "small_kettlebell", label: "Kettlebell (S)", defaultSelected: true },
+  { id: "dumbbell", label: "Dumbbells", defaultSelected: true },
+  { id: "olympic_bar", label: "Barbell", defaultSelected: false },
+  { id: "resistance_band", label: "Resistance Band", defaultSelected: true },
+  { id: "step_box", label: "Step/Box", defaultSelected: true }
 ];
 
 const STEP_TYPES = {
@@ -60,6 +62,17 @@ function buildPlan(groupsById, groupOrder, equipmentSet) {
 
     const matching = (group.movements ?? []).filter((movement) => {
       const equipment = movement.equipment ?? [];
+      const requiredEquipment = movement.requires ?? [];
+      const hasRequiredEquipment = requiredEquipment.every((item) => equipmentSet.has(item));
+
+      if (!hasRequiredEquipment) {
+        return false;
+      }
+
+      if (equipment.length === 0) {
+        return true;
+      }
+
       return equipment.some((item) => equipmentSet.has(item));
     });
 
@@ -192,7 +205,7 @@ export default function App() {
     EQUIPMENT_OPTIONS.reduce(
       (acc, item) => ({
         ...acc,
-        [item.id]: item.id !== "olympic_bar"
+        [item.id]: item.defaultSelected
       }),
       {}
     )
@@ -252,6 +265,32 @@ export default function App() {
     });
     return selected;
   }, [equipment]);
+
+  const neededEquipment = useMemo(() => {
+    const needed = new Set();
+
+    plan.forEach((item) => {
+      const movement = item.movement;
+      if (!movement) return;
+
+      (movement.requires ?? []).forEach((equipmentId) => {
+        needed.add(equipmentId);
+      });
+
+      const movementEquipment = movement.equipment ?? [];
+      const canUseBodyweight = movementEquipment.includes("bodyweight");
+
+      if (!canUseBodyweight) {
+        movementEquipment
+          .filter((equipmentId) => equipmentId !== "bodyweight" && equipmentSet.has(equipmentId))
+          .forEach((equipmentId) => {
+            needed.add(equipmentId);
+          });
+      }
+    });
+
+    return needed;
+  }, [equipmentSet, plan]);
 
   useEffect(() => {
     if (!routine) return;
@@ -416,6 +455,8 @@ export default function App() {
   const remainingDisplay = formatDuration(timeRemaining);
   const currentStep = steps[stepIndex] ?? null;
   const stepHeadline = currentStep?.headline ?? "Ready";
+  const pausedHeadline =
+    status === "paused" ? `Paused - ${currentStep?.headline ?? "Ready"}` : "Planned movements";
   const isLocked = status === "running" || status === "paused";
   const isRunning = status === "running";
   const missingMovements = plan.filter((item) => !item.movement);
@@ -480,22 +521,28 @@ export default function App() {
               <h3>Equipment</h3>
               <p className="hint">Select what you have available to filter movements.</p>
               <div className="equipment-grid">
-                {EQUIPMENT_OPTIONS.map((item) => (
-                  <label key={item.id} className={`pill ${equipment[item.id] ? "active" : ""}`}>
-                    <input
-                      type="checkbox"
-                      checked={equipment[item.id]}
-                      disabled={isLocked}
-                      onChange={() =>
-                        setEquipment((prev) => ({
-                          ...prev,
-                          [item.id]: !prev[item.id]
-                        }))
-                      }
-                    />
-                    {item.label}
-                  </label>
-                ))}
+                {EQUIPMENT_OPTIONS.map((item) => {
+                  const pillClasses = ["pill"];
+                  if (equipment[item.id]) pillClasses.push("active");
+                  if (neededEquipment.has(item.id)) pillClasses.push("needed");
+
+                  return (
+                    <label key={item.id} className={pillClasses.join(" ")}>
+                      <input
+                        type="checkbox"
+                        checked={equipment[item.id]}
+                        disabled={isLocked}
+                        onChange={() =>
+                          setEquipment((prev) => ({
+                            ...prev,
+                            [item.id]: !prev[item.id]
+                          }))
+                        }
+                      />
+                      {item.label}
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -592,7 +639,8 @@ export default function App() {
                 </>
               ) : (
                 <div className="planned">
-                  <p className="label">Planned movements</p>
+                  <p className="label">{pausedHeadline}</p>
+                  {status === "paused" ? <p className="sub-message">{remainingDisplay} remaining</p> : null}
                   {plan.length > 0 ? (
                     <ol className="planned-list">
                       {plan.map((item, index) => (
