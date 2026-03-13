@@ -1,0 +1,12 @@
+running_1::
+  - name: "Runners Full Body Resilience"
+    movement_groups:
+      - core_stability
+      - knee_strength
+      - ankle_stability
+      - upper_back_strength
+      - hip_mobility
+      - core_strength
+      - knee_stability
+      - posterior_chain_strength
+    rotations: 3

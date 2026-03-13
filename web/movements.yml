@@ -1,0 +1,141 @@
+posterior_chain_strength:
+  - name: "Posterior Chain Strength"
+    movements:
+      - id: deadlift
+        name: Deadlift
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Hinge at the hips, keep your back flat, drive through the floor as you stand tall.
+      - id: rdl
+        name: Romanian Deadlift
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Soft bend in the knees, push your hips back, feel the hamstring load before you return.
+
+knee_stability:
+  - name: "Knee Stability"
+    movements:
+      - id: bulgarian_split
+        name: Bulgarian Split Squats
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Keep your front shin vertical, drive the knee out over your pinky toe.
+      - id: reverse_lunge
+        name: Reverse Lunge
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Step back with control, keep your torso upright, front knee tracks over the foot.
+      - id: td_squat
+        name: Touchdown Squat
+        requires: ["step_box"]
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell"]
+        cues: Press through the whole foot on the box/step, avoid pushing off the back leg.
+
+knee_strength:
+  - name: "Knee Strength"
+    movements:
+      - id: squat
+        name: "Squat"
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Chest up, knees out, break parallel if you can — own the bottom position.
+      - id: goblet_squat
+        name: "Goblet Squat"
+        equipment: ["large_kettlebell", "small_kettlebell", "dumbbell"]
+        cues: Hold the weight close to your chest, use your elbows to push your knees wide at the bottom.
+      - id: squat_jump
+        name: "Squat Jump"
+        equipment: ["bodyweight"]
+        cues: Load the hips on the way down, explode through your whole foot, land softly with bent knees — absorb, don't thud.
+      # - id: cossack_squat
+      #   name: Cossack Squat
+      #   equipment: ["bodyweight", "small_kettlebell", "dumbbell"]
+      #   cues: Shift your weight to one side, keep the heel down, let the other leg extend long.
+      - id: wall_sit
+        name: "Wall Sit"
+        equipment: ["bodyweight"]
+        cues: Thighs parallel to the floor, back flat against the wall, breathe steadily and hold.
+      - id: step_up
+        name: "Step Up"
+        requires: ["step_box"]
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell"]
+        cues: Drive through the heel of the working leg, don't push off the floor — make the top leg do the work.
+core_stability:
+  - name: "Core Stability"
+    movements:
+      - id: dead_bug
+        name: Dead Bug
+        equipment: ["bodyweight"]
+        cues: Press your lower back into the floor throughout — don't let it arch as you extend.
+      - id: pallof_press
+        name: Pallof Press
+        requires: ["resistance_band"]
+        equipment: ["bodyweight"]
+        cues: Resist rotation as you press out — your core works hardest when the weight is furthest away.
+      - id: bird_dog
+        name: Bird Dog
+        equipment: ["bodyweight"]
+        cues: Move slowly, keep your hips level, think about reaching long rather than lifting high.
+      - id: plank
+        name: Plank
+        equipment: ["bodyweight"]
+        cues: Squeeze your glutes and quads, don't let your hips sag or pike — one straight line.
+
+core_strength:
+  - name: "Core Strength"
+    movements:
+      - id: leg_lift
+        name: Leg Lift
+        equipment: ["bodyweight"]
+        cues: Keep your lower back pressed into the floor, lower your legs slowly — stop before your back peels off the ground.
+      # - id: single_leg_lift
+      #   name: Single Leg Lift
+      #   equipment: ["bodyweight"]
+      #   cues: Lower one leg at a time, keep the other vertical, brace hard — this is a lower back test as much as an abs one.
+      - id: hollow_hold
+        name: Hollow Hold
+        equipment: ["bodyweight"]
+        cues: Arms overhead, legs low, press your lower back down and find the position where everything is just barely holding — then breathe.
+      # - id: v_up
+      #   name: V-Up
+      #   equipment: ["bodyweight"]
+      #   cues: Reach your hands and feet toward each other simultaneously, keep the movement controlled — don't flop back down.
+
+ankle_stability:
+  - name: "Ankle Stability"
+    movements:
+      - id: calf_raise_single
+        name: Single Leg Calf Raise
+        equipment: ["bodyweight", "dumbbell"]
+        cues: Go all the way up, all the way down — a slow eccentric builds the most resilience.
+      - id: pogos
+        name: Pogo Jumps
+        equipment: ["bodyweight"]
+        cues: Stay on your forefoot, keep ground contact time short — think of your ankles as springs, not levers.
+      - id: single_leg_pogos
+        name: Single-Leg Pogo Jumps
+        equipment: ["bodyweight"]
+        cues: Minimal knee bend, all ankle — land and leave the ground as quickly as you can while staying in control.
+
+upper_back_strength:
+  - name: "Upper Back Strength"
+    movements:
+      - id: kb_row
+        name: Single Arm Kettlebell Row
+        equipment: ["large_kettlebell", "small_kettlebell", "dumbbell"]
+        cues: Drive your elbow back and up, keep your torso still — the row is in the back, not the bicep.
+      - id: push_up
+        name: Push Ups
+        equipment: ["bodyweight"]
+        cues: Hands just outside shoulder width, keep your body rigid, lower until your chest nearly touches — don't let your hips sag or your elbows flare wide.
+
+hip_mobility:
+  - name: "Hip Mobility"
+    movements:
+      # - id: hip_90_90
+      #   name: 90/90 Hip Stretch
+      #   equipment: ["bodyweight"]
+      #   cues: Sit tall, rotate forward over the front shin, keep your hips grounded.
+      # - id: hip_flexor_lunge
+      #   name: Hip Flexor Lunge Stretch
+      #   equipment: ["bodyweight"]
+      #   cues: Posterior pelvic tilt first — tuck your tailbone — then lean forward to feel the stretch.
+      - id: glute_bridge
+        name: Glute Bridge
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell"]
+        cues: Drive through your heels, squeeze at the top, don't hyperextend your lower back.

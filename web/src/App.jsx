@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { load as loadYaml } from "js-yaml";
+import movementsYamlText from "../movements.yml?raw";
+import routinesYamlText from "../routines.yml?raw";
 
 const DEFAULT_START_DURATION = 10;
 const DEFAULT_MOVE_DURATION = 45;
@@ -228,22 +230,18 @@ export default function App() {
   const lastRemainingRef = useRef(null);
 
   useEffect(() => {
-    Promise.all([fetch("/movements.yml"), fetch("/routines.yml")])
-      .then(async ([movementsRes, routinesRes]) => {
-        const movementsText = await movementsRes.text();
-        const routinesText = await routinesRes.text();
-        const movementGroupsList = buildMovementGroups(loadYaml(movementsText));
-        const routinesList = buildRoutines(loadYaml(routinesText));
-        setMovementGroups(movementGroupsList);
-        setRoutines(routinesList);
-        if (routinesList.length > 0) {
-          setSelectedRoutineId(routinesList[0].id);
-        }
-      })
-      .catch(() => {
-        setMovementGroups([]);
-        setRoutines([]);
-      });
+    try {
+      const movementGroupsList = buildMovementGroups(loadYaml(movementsYamlText));
+      const routinesList = buildRoutines(loadYaml(routinesYamlText));
+      setMovementGroups(movementGroupsList);
+      setRoutines(routinesList);
+      if (routinesList.length > 0) {
+        setSelectedRoutineId(routinesList[0].id);
+      }
+    } catch {
+      setMovementGroups([]);
+      setRoutines([]);
+    }
   }, []);
 
   const routine = useMemo(
