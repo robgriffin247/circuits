@@ -279,6 +279,7 @@ input[type="number"] {
   padding: 12px;
   border-radius: 14px;
   background: #f7f4ee;
+  align-items: center;
 }
 
 .group-info {
@@ -295,6 +296,30 @@ input[type="number"] {
   margin: 0;
   font-size: 0.75rem;
   color: var(--neutral-500);
+}
+
+.group-actions {
+  display: none;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mini-button {
+  border: 1px solid #d3c9b7;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--neutral-700);
+  cursor: pointer;
+}
+
+.mini-button:hover {
+  background: #f1eadf;
 }
 
 .hint {
@@ -346,6 +371,14 @@ input[type="number"] {
 
   .columns {
     grid-template-columns: 1fr;
+  }
+
+  .panel-controls {
+    justify-content: center;
+  }
+
+  .group-actions {
+    display: flex;
   }
 }
 .panel-controls {

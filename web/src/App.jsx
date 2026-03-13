@@ -198,8 +198,16 @@ export default function App() {
     const nextSteps = buildSteps(routine, durations, rotations);
     const nextIndex = Math.min(stepIndex, Math.max(nextSteps.length - 1, 0));
     setSteps(nextSteps);
-    setStepIndex(nextIndex);
-    setTimeRemaining(nextSteps[nextIndex]?.duration ?? 0);
+
+    if (nextIndex !== stepIndex) {
+      setStepIndex(nextIndex);
+      setTimeRemaining(nextSteps[nextIndex]?.duration ?? 0);
+      return;
+    }
+
+    if (status !== "paused") {
+      setTimeRemaining(nextSteps[nextIndex]?.duration ?? 0);
+    }
   }, [routine, durations, rotations, status, stepIndex]);
 
   const clearIntervalTimer = () => {
@@ -240,6 +248,14 @@ export default function App() {
     if (status !== "running") return;
     setStatus("paused");
     endTimeRef.current = null;
+  };
+
+  const handleToggle = () => {
+    if (status === "running") {
+      handlePause();
+      return;
+    }
+    handleStart();
   };
 
   const handleStop = () => {
@@ -319,12 +335,13 @@ export default function App() {
   const stepHeadline = currentStep?.headline ?? "Ready";
   const stepSub = currentStep?.subMessage ?? "Set your timing and target areas.";
 
-  const backgroundClass =
-    currentStep?.type === STEP_TYPES.exercise
+  const backgroundClass = isRunning
+    ? currentStep?.type === STEP_TYPES.exercise
       ? "panel exercise"
       : currentStep?.type === STEP_TYPES.rest
         ? "panel rest"
-        : "panel idle";
+        : "panel idle"
+    : "panel idle";
 
   const handleDragStart = (groupId, from) => {
     dragRef.current = { groupId, from };
@@ -369,6 +386,29 @@ export default function App() {
       setAvailableGroupIds(nextAvailable);
     }
     setSelectedGroupIds((prev) => prev.filter((id) => id !== groupId));
+  };
+
+  const moveToSelected = (groupId) => {
+    if (selectedGroupIds.includes(groupId)) return;
+    setSelectedGroupIds((prev) => [...prev, groupId]);
+    setAvailableGroupIds((prev) => prev.filter((id) => id !== groupId));
+  };
+
+  const moveToAvailable = (groupId) => {
+    if (availableGroupIds.includes(groupId)) return;
+    setAvailableGroupIds((prev) => [...prev, groupId]);
+    setSelectedGroupIds((prev) => prev.filter((id) => id !== groupId));
+  };
+
+  const moveSelected = (groupId, direction) => {
+    const index = selectedGroupIds.indexOf(groupId);
+    if (index === -1) return;
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= selectedGroupIds.length) return;
+    const next = [...selectedGroupIds];
+    const [item] = next.splice(index, 1);
+    next.splice(nextIndex, 0, item);
+    setSelectedGroupIds(next);
   };
 
   return (
@@ -421,14 +461,17 @@ export default function App() {
                     <path d="M5 5h2v14H5zM19 6v12l-8.5-6L19 6z" />
                   </svg>
                 </button>
-                <button className="icon-button" onClick={handlePause} aria-label="Pause">
+                <button
+                  className="icon-button primary"
+                  onClick={handleToggle}
+                  aria-label={status === "running" ? "Pause" : "Play"}
+                >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
-                  </svg>
-                </button>
-                <button className="icon-button primary" onClick={handleStart} aria-label="Play">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M8 5v14l11-7-11-7z" />
+                    {status === "running" ? (
+                      <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+                    ) : (
+                      <path d="M8 5v14l11-7-11-7z" />
+                    )}
                   </svg>
                 </button>
                 <button className="icon-button" onClick={() => handleSkip(1)} aria-label="Skip forward">
@@ -512,6 +555,16 @@ export default function App() {
                           <p className="group-desc">{group.description}</p>
                         </div>
                       </div>
+                      <div className="group-actions">
+                        <button
+                          type="button"
+                          className="mini-button"
+                          onClick={() => moveToSelected(id)}
+                          aria-label={`Add ${group.name} to selected`}
+                        >
+                          Add
+                        </button>
+                      </div>
                     </li>
                   );
                 })}
@@ -540,6 +593,32 @@ export default function App() {
                           <p className="group-name">{group.name}</p>
                           <p className="group-desc">{group.description}</p>
                         </div>
+                      </div>
+                      <div className="group-actions">
+                        <button
+                          type="button"
+                          className="mini-button"
+                          onClick={() => moveSelected(id, -1)}
+                          aria-label={`Move ${group.name} up`}
+                        >
+                          Up
+                        </button>
+                        <button
+                          type="button"
+                          className="mini-button"
+                          onClick={() => moveSelected(id, 1)}
+                          aria-label={`Move ${group.name} down`}
+                        >
+                          Down
+                        </button>
+                        <button
+                          type="button"
+                          className="mini-button"
+                          onClick={() => moveToAvailable(id)}
+                          aria-label={`Remove ${group.name} from selected`}
+                        >
+                          Remove
+                        </button>
                       </div>
                     </li>
                   );
