@@ -1,0 +1,39 @@
+posterior_chain_strength:
+  - name: "Posterior Chain Strength"
+    movements:
+      - id: deadlift
+        name: Deadlift
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Do this and this
+      - id: rdl
+        name: Romanian Deadlift
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Now that
+      - id: kb-swing
+        name: Kettlebell Swing
+        equipment: ["large_kettlebell", "small_kettlebell"]
+        cues: Swiiing
+
+knee_stability:
+  - name: "Knee Stability"
+    movements:
+      - id: bulgarian_split
+        name: Bulgarian Split Squats
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Kneeeeeeees
+      - id: reverse_lunge
+        name: Reverse Lunge
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Back it up!
+
+knee_strength:
+  - name: "Knee Strength"
+    movements:
+      - id: squat
+        name: "Squat"
+        equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell", "olympic_bar"]
+        cues: Get lowwwww!
+      - id: goblet_squat
+        name: "Goblet Squat"
+        equipment: ["large_kettlebell", "small_kettlebell", "dumbbell"]
+        cues: You chose, poorly.
