@@ -42,10 +42,10 @@ knee_strength:
         name: "Squat Jump"
         equipment: ["bodyweight"]
         cues: Load the hips on the way down, explode through your whole foot, land softly with bent knees — absorb, don't thud.
-      - id: cossack_squat
-        name: Cossack Squat
-        equipment: ["bodyweight", "small_kettlebell", "dumbbell"]
-        cues: Shift your weight to one side, keep the heel down, let the other leg extend long.
+      # - id: cossack_squat
+      #   name: Cossack Squat
+      #   equipment: ["bodyweight", "small_kettlebell", "dumbbell"]
+      #   cues: Shift your weight to one side, keep the heel down, let the other leg extend long.
       - id: wall_sit
         name: "Wall Sit"
         equipment: ["bodyweight"]
@@ -83,18 +83,18 @@ core_strength:
         name: Leg Lift
         equipment: ["bodyweight"]
         cues: Keep your lower back pressed into the floor, lower your legs slowly — stop before your back peels off the ground.
-      - id: single_leg_lift
-        name: Single Leg Lift
-        equipment: ["bodyweight"]
-        cues: Lower one leg at a time, keep the other vertical, brace hard — this is a lower back test as much as an abs one.
+      # - id: single_leg_lift
+      #   name: Single Leg Lift
+      #   equipment: ["bodyweight"]
+      #   cues: Lower one leg at a time, keep the other vertical, brace hard — this is a lower back test as much as an abs one.
       - id: hollow_hold
         name: Hollow Hold
         equipment: ["bodyweight"]
         cues: Arms overhead, legs low, press your lower back down and find the position where everything is just barely holding — then breathe.
-      - id: v_up
-        name: V-Up
-        equipment: ["bodyweight"]
-        cues: Reach your hands and feet toward each other simultaneously, keep the movement controlled — don't flop back down.
+      # - id: v_up
+      #   name: V-Up
+      #   equipment: ["bodyweight"]
+      #   cues: Reach your hands and feet toward each other simultaneously, keep the movement controlled — don't flop back down.
 
 ankle_stability:
   - name: "Ankle Stability"
@@ -127,14 +127,14 @@ upper_back_strength:
 hip_mobility:
   - name: "Hip Mobility"
     movements:
-      - id: hip_90_90
-        name: 90/90 Hip Stretch
-        equipment: ["bodyweight"]
-        cues: Sit tall, rotate forward over the front shin, keep your hips grounded.
-      - id: hip_flexor_lunge
-        name: Hip Flexor Lunge Stretch
-        equipment: ["bodyweight"]
-        cues: Posterior pelvic tilt first — tuck your tailbone — then lean forward to feel the stretch.
+      # - id: hip_90_90
+      #   name: 90/90 Hip Stretch
+      #   equipment: ["bodyweight"]
+      #   cues: Sit tall, rotate forward over the front shin, keep your hips grounded.
+      # - id: hip_flexor_lunge
+      #   name: Hip Flexor Lunge Stretch
+      #   equipment: ["bodyweight"]
+      #   cues: Posterior pelvic tilt first — tuck your tailbone — then lean forward to feel the stretch.
       - id: glute_bridge
         name: Glute Bridge
         equipment: ["bodyweight", "large_kettlebell", "small_kettlebell", "dumbbell"]
