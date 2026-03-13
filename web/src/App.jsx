@@ -6,10 +6,10 @@ import routinesYamlText from "../routines.yml?raw";
 const DEFAULT_START_DURATION = 10;
 const DEFAULT_MOVE_DURATION = 45;
 const DEFAULT_REST_DURATION = 30;
+const SIDE_SWITCH_DURATION = 10;
 
 const EQUIPMENT_OPTIONS = [
-  { id: "large_kettlebell", label: "Kettlebell (L)", defaultSelected: true },
-  { id: "small_kettlebell", label: "Kettlebell (S)", defaultSelected: true },
+  { id: "kettlebell", label: "Kettlebell", defaultSelected: true },
   { id: "dumbbell", label: "Dumbbells", defaultSelected: true },
   { id: "olympic_bar", label: "Barbell", defaultSelected: false },
   { id: "resistance_band", label: "Resistance Band", defaultSelected: true },
@@ -19,16 +19,23 @@ const EQUIPMENT_OPTIONS = [
 const STEP_TYPES = {
   start: "start",
   exercise: "exercise",
-  rest: "rest"
+  rest: "rest",
+  switch: "switch"
 };
 
-function buildMovementGroups(raw) {
+const EQUIPMENT_LABELS = Object.fromEntries(EQUIPMENT_OPTIONS.map((item) => [item.id, item.label]));
+
+function buildMovements(raw) {
   return Object.entries(raw ?? {}).map(([id, value]) => {
     const entry = Array.isArray(value) ? value[0] : value;
     return {
       id,
       name: entry?.name ?? id,
-      movements: entry?.movements ?? []
+      category: entry?.category ?? "",
+      categoryName: entry?.category_name ?? entry?.category ?? "",
+      side: Boolean(entry?.side),
+      requires: entry?.requires ?? [],
+      cues: entry?.cues ?? ""
     };
   });
 }
@@ -36,11 +43,14 @@ function buildMovementGroups(raw) {
 function buildRoutines(raw) {
   return Object.entries(raw ?? {}).map(([id, value]) => {
     const entry = Array.isArray(value) ? value[0] : value;
+    const maxSidedMovements = Number(entry?.max_sided_movements);
+
     return {
       id,
       name: entry?.name ?? id,
-      movementGroups: entry?.movement_groups ?? [],
-      rotations: Number(entry?.rotations ?? 1)
+      movements: (entry?.movements ?? []).map((slot) => (Array.isArray(slot) ? slot : [slot])),
+      rotations: Number(entry?.rotations ?? 1),
+      maxSidedMovements: Number.isFinite(maxSidedMovements) ? maxSidedMovements : Infinity
     };
   });
 }
@@ -50,98 +60,140 @@ function randomPick(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function buildPlan(groupsById, groupOrder, equipmentSet) {
-  return groupOrder.map((groupId) => {
-    const group = groupsById[groupId];
-    if (!group) {
+function normalizeRequirementGroup(requirement) {
+  return Array.isArray(requirement) ? requirement : [requirement];
+}
+
+function meetsRequirements(requirements, equipmentSet) {
+  return (requirements ?? []).every((requirement) => {
+    return normalizeRequirementGroup(requirement).some((item) => equipmentSet.has(item));
+  });
+}
+
+function buildPlan(movementsById, movementSlots, equipmentSet, maxSidedMovements) {
+  let sidedCount = 0;
+
+  return movementSlots.map((movementIds, index) => {
+    const candidates = movementIds.map((movementId) => movementsById[movementId]).filter(Boolean);
+
+    if (candidates.length === 0) {
       return {
-        groupId,
-        groupName: "Unknown group",
+        groupId: `slot-${index}`,
+        groupName: "Movement",
         movement: null,
-        reason: "Group not found"
+        options: [],
+        selectedIndex: -1,
+        reason: "Movement not found"
       };
     }
 
-    const matching = (group.movements ?? []).filter((movement) => {
-      const equipment = movement.equipment ?? [];
-      const requiredEquipment = movement.requires ?? [];
-      const hasRequiredEquipment = requiredEquipment.every((item) => equipmentSet.has(item));
-
-      if (!hasRequiredEquipment) {
-        return false;
-      }
-
-      if (equipment.length === 0) {
-        return true;
-      }
-
-      return equipment.some((item) => equipmentSet.has(item));
-    });
+    const matching = candidates.filter((movement) => meetsRequirements(movement.requires, equipmentSet));
 
     if (matching.length === 0) {
       return {
-        groupId,
-        groupName: group.name,
+        groupId: `slot-${index}`,
+        groupName: candidates[0].categoryName || "Movement",
         movement: null,
+        options: [],
+        selectedIndex: -1,
         reason: "No matching equipment"
       };
     }
 
+    const available = sidedCount >= maxSidedMovements ? matching.filter((movement) => !movement.side) : matching;
+
+    if (available.length === 0) {
+      return {
+        groupId: `slot-${index}`,
+        groupName: candidates[0].categoryName || "Movement",
+        movement: null,
+        options: [],
+        selectedIndex: -1,
+        reason: "Sided movement limit reached"
+      };
+    }
+
+    const selectedMovement = randomPick(available);
+    const selectedIndex = matching.findIndex((movement) => movement.id === selectedMovement?.id);
+    if (selectedMovement?.side) {
+      sidedCount += 1;
+    }
+
     return {
-      groupId,
-      groupName: group.name,
-      movement: randomPick(matching),
+      groupId: `slot-${index}`,
+      groupName: candidates[0].categoryName || "Movement",
+      movement: selectedMovement,
+      options: matching,
+      selectedIndex,
       reason: ""
     };
   });
 }
 
-function findNextExercise(steps, startIndex) {
-  for (let i = startIndex + 1; i < steps.length; i += 1) {
-    const step = steps[i];
-    if (step.type === STEP_TYPES.exercise) {
-      return step.headline;
-    }
-  }
-  return "Finished";
-}
-
 function buildSteps(plan, durations, rotations) {
-  const movements = plan.filter((item) => item.movement).map((item) => item.movement);
+  const baseMovements = plan.filter((item) => item.movement).map((item) => item.movement);
+  const sequence = [];
+
+  for (let rotation = 0; rotation < rotations; rotation += 1) {
+    baseMovements.forEach((movement) => {
+      sequence.push(movement);
+    });
+  }
+
   const steps = [];
-  const startMessage =
-    movements.length > 0 ? `Coming up: ${movements[0].name}` : "Coming up: Build your routine";
+  const firstMovement = sequence[0] ?? null;
 
   steps.push({
     type: STEP_TYPES.start,
-    headline: "Get Ready!",
-    subMessage: startMessage,
+    label: "Next",
+    headline: firstMovement?.name ?? "Build your routine",
+    cues: firstMovement?.cues ?? "Pick a routine to build your circuit.",
     duration: durations.start
   });
 
-  for (let rotation = 0; rotation < rotations; rotation += 1) {
-    for (let i = 0; i < movements.length; i += 1) {
-      const movement = movements[i];
-      const isLastMovement = rotation === rotations - 1 && i === movements.length - 1;
-      const nextMovement = movements[i + 1] ?? (rotation + 1 < rotations ? movements[0] : null);
+  sequence.forEach((movement, index) => {
+    const nextMovement = sequence[index + 1] ?? null;
+
+    steps.push({
+      type: STEP_TYPES.exercise,
+      label: movement.side ? "Now - First Side" : "Now",
+      headline: movement.name,
+      cues: movement.cues ?? "",
+      duration: durations.move,
+      movement
+    });
+
+    if (movement.side) {
       steps.push({
-        type: STEP_TYPES.exercise,
+        type: STEP_TYPES.switch,
+        label: "Swap Sides",
         headline: movement.name,
-        subMessage: movement.cues ?? "",
-        duration: durations.move,
+        cues: movement.cues ?? "",
+        duration: SIDE_SWITCH_DURATION,
         movement
       });
 
-      if (!isLastMovement) {
-        steps.push({
-          type: STEP_TYPES.rest,
-          headline: "Rest",
-          subMessage: nextMovement ? `Up next: ${nextMovement.name}` : "Up next: Finished!",
-          duration: durations.rest
-        });
-      }
+      steps.push({
+        type: STEP_TYPES.exercise,
+        label: "Now - Second Side",
+        headline: movement.name,
+        cues: movement.cues ?? "",
+        duration: durations.move,
+        movement
+      });
     }
-  }
+
+    if (nextMovement) {
+      steps.push({
+        type: STEP_TYPES.rest,
+        label: "Next",
+        headline: nextMovement.name,
+        cues: nextMovement.cues ?? "",
+        duration: durations.rest,
+        movement: nextMovement
+      });
+    }
+  });
 
   return steps;
 }
@@ -186,6 +238,7 @@ function useBeep() {
 
   return {
     shortBeep: () => play(120, 880),
+    switchBeep: () => play(120, 1220),
     longBeep: () => play(450, 660),
     resume: () => {
       if (audioRef.current && audioRef.current.state === "suspended") {
@@ -199,8 +252,20 @@ function formatDuration(value) {
   return String(value).padStart(2, "0");
 }
 
+function formatTotalDuration(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes === 0) return `${seconds}s`;
+  if (seconds === 0) return `${minutes}m`;
+  return `${minutes}m ${seconds}s`;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
 export default function App() {
-  const [movementGroups, setMovementGroups] = useState([]);
+  const [movements, setMovements] = useState([]);
   const [routines, setRoutines] = useState([]);
   const [selectedRoutineId, setSelectedRoutineId] = useState("");
   const [equipment, setEquipment] = useState(() =>
@@ -218,12 +283,18 @@ export default function App() {
     rest: DEFAULT_REST_DURATION
   });
   const [rotations, setRotations] = useState(1);
+  const [durationInputs, setDurationInputs] = useState({
+    move: String(DEFAULT_MOVE_DURATION),
+    rest: String(DEFAULT_REST_DURATION)
+  });
+  const [rotationInput, setRotationInput] = useState("1");
   const [plan, setPlan] = useState([]);
   const [steps, setSteps] = useState([]);
   const [stepIndex, setStepIndex] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [status, setStatus] = useState("idle");
-  const { shortBeep, longBeep, resume } = useBeep();
+  const [hasFinished, setHasFinished] = useState(false);
+  const { shortBeep, switchBeep, longBeep, resume } = useBeep();
   const intervalRef = useRef(null);
   const advancePendingRef = useRef(false);
   const endTimeRef = useRef(null);
@@ -231,15 +302,15 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const movementGroupsList = buildMovementGroups(loadYaml(movementsYamlText));
+      const movementList = buildMovements(loadYaml(movementsYamlText));
       const routinesList = buildRoutines(loadYaml(routinesYamlText));
-      setMovementGroups(movementGroupsList);
+      setMovements(movementList);
       setRoutines(routinesList);
       if (routinesList.length > 0) {
         setSelectedRoutineId(routinesList[0].id);
       }
     } catch {
-      setMovementGroups([]);
+      setMovements([]);
       setRoutines([]);
     }
   }, []);
@@ -249,12 +320,12 @@ export default function App() {
     [routines, selectedRoutineId]
   );
 
-  const groupsById = useMemo(() => {
-    return movementGroups.reduce((acc, group) => {
-      acc[group.id] = group;
+  const movementsById = useMemo(() => {
+    return movements.reduce((acc, movement) => {
+      acc[movement.id] = movement;
       return acc;
     }, {});
-  }, [movementGroups]);
+  }, [movements]);
 
   const equipmentSet = useMemo(() => {
     const selected = new Set(["bodyweight"]);
@@ -268,46 +339,51 @@ export default function App() {
     const needed = new Set();
 
     plan.forEach((item) => {
-      const movement = item.movement;
-      if (!movement) return;
-
-      (movement.requires ?? []).forEach((equipmentId) => {
-        needed.add(equipmentId);
+      (item.movement?.requires ?? []).forEach((requirement) => {
+        normalizeRequirementGroup(requirement).forEach((equipmentId) => {
+          needed.add(equipmentId);
+        });
       });
-
-      const movementEquipment = movement.equipment ?? [];
-      const canUseBodyweight = movementEquipment.includes("bodyweight");
-
-      if (!canUseBodyweight) {
-        movementEquipment
-          .filter((equipmentId) => equipmentId !== "bodyweight" && equipmentSet.has(equipmentId))
-          .forEach((equipmentId) => {
-            needed.add(equipmentId);
-          });
-      }
     });
 
     return needed;
-  }, [equipmentSet, plan]);
+  }, [plan]);
 
   useEffect(() => {
     if (!routine) return;
     setRotations(routine.rotations);
   }, [routine]);
 
+  useEffect(() => {
+    setDurationInputs({
+      move: String(durations.move),
+      rest: String(durations.rest)
+    });
+  }, [durations.move, durations.rest]);
+
+  useEffect(() => {
+    setRotationInput(String(rotations));
+  }, [rotations]);
+
   const regeneratePlan = () => {
     if (!routine) {
       setPlan([]);
       return;
     }
-    const nextPlan = buildPlan(groupsById, routine.movementGroups, equipmentSet);
+
+    const nextPlan = buildPlan(
+      movementsById,
+      routine.movements,
+      equipmentSet,
+      routine.maxSidedMovements
+    );
     setPlan(nextPlan);
   };
 
   useEffect(() => {
     if (status === "running") return;
     regeneratePlan();
-  }, [routine, groupsById, equipmentSet, status]);
+  }, [routine, movementsById, equipmentSet, status]);
 
   useEffect(() => {
     if (status === "running") return;
@@ -338,6 +414,7 @@ export default function App() {
     setStepIndex(0);
     setTimeRemaining(steps[0]?.duration ?? 0);
     setStatus("running");
+    setHasFinished(false);
     advancePendingRef.current = false;
     endTimeRef.current = performance.now() + (steps[0]?.duration ?? 0) * 1000;
     lastRemainingRef.current = null;
@@ -369,24 +446,10 @@ export default function App() {
     handleStart();
   };
 
-  const handleStop = () => {
-    clearIntervalTimer();
-    setStatus("stopped");
-    setTimeRemaining(0);
-    setStepIndex(0);
-    advancePendingRef.current = false;
-    endTimeRef.current = null;
-    lastRemainingRef.current = null;
-  };
-
-  const handleRestart = () => {
-    clearIntervalTimer();
-    initializeTimer();
-  };
-
   const handleStartOver = () => {
     clearIntervalTimer();
     setStatus("idle");
+    setHasFinished(false);
     setTimeRemaining(0);
     setStepIndex(0);
     advancePendingRef.current = false;
@@ -407,6 +470,51 @@ export default function App() {
     }
   };
 
+  const handleCyclePlannedMovement = (planIndex, direction) => {
+    if (isLocked) return;
+
+    setPlan((prev) =>
+      prev.map((item, index) => {
+        if (index !== planIndex || !item.options || item.options.length <= 1) {
+          return item;
+        }
+
+        const nextSelectedIndex =
+          (item.selectedIndex + direction + item.options.length) % item.options.length;
+
+        return {
+          ...item,
+          selectedIndex: nextSelectedIndex,
+          movement: item.options[nextSelectedIndex]
+        };
+      })
+    );
+  };
+
+  const commitDurationInput = (key, min, max) => {
+    setDurations((prev) => {
+      const parsed = Number(durationInputs[key]);
+      const nextValue = Number.isFinite(parsed) ? clamp(parsed, min, max) : prev[key];
+      const nextDurations = { ...prev, [key]: nextValue };
+      setDurationInputs({
+        move: String(key === "move" ? nextValue : nextDurations.move),
+        rest: String(key === "rest" ? nextValue : nextDurations.rest)
+      });
+      return nextDurations;
+    });
+  };
+
+  const commitRotationInput = () => {
+    setRotations((prev) => {
+      const parsed = Number(rotationInput);
+      const nextValue = Number.isFinite(parsed) ? clamp(parsed, 1, 20) : prev;
+      setRotationInput(String(nextValue));
+      return nextValue;
+    });
+  };
+
+  const currentStep = steps[stepIndex] ?? null;
+
   useEffect(() => {
     clearIntervalTimer();
 
@@ -419,16 +527,29 @@ export default function App() {
         const now = performance.now();
         const remaining = Math.max(0, Math.ceil((endTimeRef.current - now) / 1000));
         if (lastRemainingRef.current !== remaining) {
+          const useSwitchTone =
+            currentStep?.type === STEP_TYPES.switch ||
+            (currentStep?.type === STEP_TYPES.exercise && steps[stepIndex + 1]?.type === STEP_TYPES.switch);
+
           if ([3, 2, 1].includes(remaining)) {
-            shortBeep();
+            if (useSwitchTone) {
+              switchBeep();
+            } else {
+              shortBeep();
+            }
           }
           if (remaining === 0 && !advancePendingRef.current) {
             advancePendingRef.current = true;
-            longBeep();
+            if (useSwitchTone) {
+              switchBeep();
+            } else {
+              longBeep();
+            }
             setStepIndex((prev) => {
               const nextIndex = prev + 1;
               if (nextIndex >= steps.length) {
                 setStatus("stopped");
+                setHasFinished(true);
                 setTimeRemaining(0);
                 endTimeRef.current = null;
                 lastRemainingRef.current = null;
@@ -448,46 +569,57 @@ export default function App() {
     }
 
     return () => clearIntervalTimer();
-  }, [status, steps, timeRemaining, shortBeep, longBeep]);
+  }, [status, steps, timeRemaining, currentStep, shortBeep, switchBeep, longBeep]);
 
   const remainingDisplay = formatDuration(timeRemaining);
-  const currentStep = steps[stepIndex] ?? null;
-  const stepHeadline = currentStep?.headline ?? "Ready";
-  const pausedHeadline =
-    status === "paused" ? `Paused - ${currentStep?.headline ?? "Ready"}` : "Planned movements";
   const isLocked = status === "running" || status === "paused";
-  const isRunning = status === "running";
+  const isRoutineSelectorDisabled = isLocked || routines.length < 2;
+  const isActive = status === "running" || status === "paused";
   const missingMovements = plan.filter((item) => !item.movement);
   const hasMovements = plan.some((item) => item.movement);
-  const nextExerciseName = isRunning ? findNextExercise(steps, stepIndex) : "";
-  const runningSubMessage =
-    currentStep?.type === STEP_TYPES.exercise
-      ? currentStep?.subMessage
-      : `Next: ${nextExerciseName}`;
+  const completedMovements = plan.filter((item) => item.movement).map((item) => item.movement.name);
   const totalDuration = steps.reduce((total, step) => total + (step.duration ?? 0), 0);
   const elapsedBeforeCurrent = steps
     .slice(0, stepIndex)
     .reduce((total, step) => total + (step.duration ?? 0), 0);
   const currentDuration = currentStep?.duration ?? 0;
-  const isActive = status === "running" || status === "paused";
   const currentElapsed = isActive ? Math.max(currentDuration - timeRemaining, 0) : 0;
   const progressValue =
     totalDuration > 0 ? (elapsedBeforeCurrent + currentElapsed) / totalDuration : 0;
+  const projectedDuration = formatTotalDuration(totalDuration);
 
-  const backgroundClass = isRunning
-    ? currentStep?.type === STEP_TYPES.exercise
-      ? "panel exercise"
-      : currentStep?.type === STEP_TYPES.rest
-        ? "panel rest"
-        : "panel idle"
-    : "panel idle";
+  const displayLabel =
+    status === "paused" ? `Paused - ${currentStep?.label ?? "Now"}` : currentStep?.label ?? "Now";
+  const displayHeadline = currentStep?.headline ?? "Ready";
+  const displayCues = currentStep?.cues ?? "";
+
+  const backgroundClass =
+    hasFinished
+      ? "panel finished"
+      : status === "running"
+      ? currentStep?.type === STEP_TYPES.exercise
+        ? "panel exercise"
+        : currentStep?.type === STEP_TYPES.switch
+          ? "panel switch"
+          : currentStep?.type === STEP_TYPES.rest
+            ? "panel rest"
+          : "panel idle"
+      : status === "paused"
+        ? currentStep?.type === STEP_TYPES.exercise
+          ? "panel exercise"
+          : currentStep?.type === STEP_TYPES.switch
+            ? "panel switch"
+            : currentStep?.type === STEP_TYPES.rest
+              ? "panel rest"
+              : "panel idle"
+        : "panel idle";
 
   return (
     <div className="app">
       <header>
         <div>
-          <h1>Circuits</h1>
-          <p className="kicker">Interval Timer</p>
+          <h1>s3:kit</h1>
+          <p className="kicker">Circuit Training App</p>
         </div>
         <div className="status" />
       </header>
@@ -500,17 +632,70 @@ export default function App() {
               <div className="field">
                 <label>
                   Choose routine
-                  <select
-                    value={selectedRoutineId}
+                  <span className="select-wrap">
+                    <select
+                      value={selectedRoutineId}
+                      disabled={isRoutineSelectorDisabled}
+                      onChange={(event) => setSelectedRoutineId(event.target.value)}
+                    >
+                      {routines.map((entry) => (
+                        <option key={entry.id} value={entry.id}>
+                          {entry.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="select-arrow" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="m7 10 5 5 5-5" />
+                      </svg>
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div className="card timing-card">
+              <h3>Timing</h3>
+              <div className="field-grid">
+                <label>
+                  Exercise (sec)
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    step="1"
+                    value={durationInputs.move}
                     disabled={isLocked}
-                    onChange={(event) => setSelectedRoutineId(event.target.value)}
-                  >
-                    {routines.map((entry) => (
-                      <option key={entry.id} value={entry.id}>
-                        {entry.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(event) =>
+                      setDurationInputs((prev) => ({ ...prev, move: event.target.value }))
+                    }
+                    onBlur={() => commitDurationInput("move", 5, 90)}
+                  />
+                </label>
+                <label>
+                  Rest (sec)
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    step="1"
+                    value={durationInputs.rest}
+                    disabled={isLocked}
+                    onChange={(event) =>
+                      setDurationInputs((prev) => ({ ...prev, rest: event.target.value }))
+                    }
+                    onBlur={() => commitDurationInput("rest", 5, 90)}
+                  />
+                </label>
+                <label>
+                  Rotations
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    step="1"
+                    value={rotationInput}
+                    disabled={isLocked}
+                    onChange={(event) => setRotationInput(event.target.value)}
+                    onBlur={commitRotationInput}
+                  />
                 </label>
               </div>
             </div>
@@ -522,7 +707,6 @@ export default function App() {
                 {EQUIPMENT_OPTIONS.map((item) => {
                   const pillClasses = ["pill"];
                   if (equipment[item.id]) pillClasses.push("active");
-                  if (neededEquipment.has(item.id)) pillClasses.push("needed");
 
                   return (
                     <label key={item.id} className={pillClasses.join(" ")}>
@@ -538,55 +722,17 @@ export default function App() {
                         }
                       />
                       {item.label}
+                      {neededEquipment.has(item.id) ? (
+                        <span className="pill-required-indicator active" aria-hidden="true">
+                          <svg viewBox="0 0 24 24">
+                            <path d="M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+                            <path d="m8.5 12.5 2.2 2.2 4.8-5.2" />
+                          </svg>
+                        </span>
+                      ) : null}
                     </label>
                   );
                 })}
-              </div>
-            </div>
-
-            <div className="card timing-card">
-              <h3>Timing</h3>
-              <div className="field-grid">
-                <label>
-                  Exercise (sec)
-                  <input
-                    type="number"
-                    min="1"
-                    value={durations.move}
-                    disabled={isLocked}
-                    onChange={(event) =>
-                      setDurations((prev) => ({
-                        ...prev,
-                        move: Number(event.target.value)
-                      }))
-                    }
-                  />
-                </label>
-                <label>
-                  Rest (sec)
-                  <input
-                    type="number"
-                    min="1"
-                    value={durations.rest}
-                    disabled={isLocked}
-                    onChange={(event) =>
-                      setDurations((prev) => ({
-                        ...prev,
-                        rest: Number(event.target.value)
-                      }))
-                    }
-                  />
-                </label>
-                <label>
-                  Rotations
-                  <input
-                    type="number"
-                    min="1"
-                    value={rotations}
-                    disabled={isLocked}
-                    onChange={(event) => setRotations(Number(event.target.value))}
-                  />
-                </label>
               </div>
             </div>
           </div>
@@ -618,57 +764,115 @@ export default function App() {
                 </svg>
               </button>
             </div>
-            <div className="panel-content">
-              {isRunning ? (
-                <>
-                  <p className="label">Now</p>
-                  <h2>{stepHeadline}</h2>
-                  {runningSubMessage ? <p className="sub-message">{runningSubMessage}</p> : null}
+
+            {isActive ? (
+              <div className="panel-content session-view">
+                <div className="session-top">
+                  <p className="label">{displayLabel}</p>
+                </div>
+                <div className="session-main">
+                  <h2>{displayHeadline}</h2>
                   <div className="timer">{remainingDisplay}</div>
-                  <div
-                    className="progress"
-                    role="progressbar"
-                    aria-valuemin={0}
-                    aria-valuemax={1}
-                    aria-valuenow={progressValue}
-                  >
-                    <div className="progress-fill" style={{ width: `${Math.min(Math.max(progressValue, 0), 1) * 100}%` }} />
+                  {displayCues ? <p className="sub-message cues">{displayCues}</p> : null}
+                </div>
+                {(status === "paused" || hasFinished) && (
+                  <div className="session-action">
+                    <button className="ghost-button" type="button" onClick={handleStartOver}>
+                      Start over
+                    </button>
                   </div>
-                </>
-              ) : (
+                )}
+                <div
+                  className="progress"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={1}
+                  aria-valuenow={progressValue}
+                >
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${Math.min(Math.max(progressValue, 0), 1) * 100}%` }}
+                  />
+                </div>
+              </div>
+            ) : hasFinished ? (
+              <div className="panel-content finished-view">
+                <div className="flare flare-one" aria-hidden="true" />
+                <div className="flare flare-two" aria-hidden="true" />
+                <div className="flare flare-three" aria-hidden="true" />
+                <p className="label">Finished</p>
+                <h2>Finished!</h2>
+                <p className="sub-message cues">Circuit complete. Here&apos;s what you just worked through.</p>
+                <ol className="finished-list">
+                  {completedMovements.map((movementName, index) => (
+                    <li key={`${movementName}-${index}`}>{movementName}</li>
+                  ))}
+                </ol>
+              </div>
+            ) : (
+              <div className="panel-content">
                 <div className="planned">
-                  <p className="label">{pausedHeadline}</p>
-                  {status === "paused" ? <p className="sub-message">{remainingDisplay} remaining</p> : null}
+                  <p className="label">Planned movements</p>
                   {plan.length > 0 ? (
                     <ol className="planned-list">
                       {plan.map((item, index) => (
                         <li key={`${item.groupId}-${index}`} className="planned-item">
-                          {item.movement?.name ?? item.reason}
+                          {item.movement ? (
+                            <div className="planned-row">
+                              <button
+                                type="button"
+                                className="cycle-button"
+                                aria-label={`Previous option for ${item.groupName}`}
+                                onClick={() => handleCyclePlannedMovement(index, -1)}
+                                disabled={isLocked || (item.options?.length ?? 0) <= 1}
+                              >
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                  <path d="M15.5 5 8.5 12l7 7" />
+                                </svg>
+                              </button>
+                              <span className="planned-move">{item.movement.name}</span>
+                              <button
+                                type="button"
+                                className="cycle-button"
+                                aria-label={`Next option for ${item.groupName}`}
+                                onClick={() => handleCyclePlannedMovement(index, 1)}
+                                disabled={isLocked || (item.options?.length ?? 0) <= 1}
+                              >
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                  <path d="m8.5 5 7 7-7 7" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            item.reason
+                          )}
                         </li>
                       ))}
                     </ol>
                   ) : (
                     <p className="planned-empty">Pick a routine to build your circuit.</p>
                   )}
+                  {plan.length > 0 ? (
+                    <div className="planned-duration">
+                      <p className="label">Projected duration</p>
+                      <p className="planned-duration-value">{projectedDuration}</p>
+                    </div>
+                  ) : null}
                 </div>
-              )}
-            </div>
-            {!isRunning && (
+              </div>
+            )}
+
+            {!isActive && !hasFinished && (
               <div className="panel-footer">
-                {status === "paused" ? (
-                  <button className="ghost-button" type="button" onClick={handleStartOver}>
-                    Start over
-                  </button>
-                ) : (
-                  <button className="ghost-button" type="button" onClick={regeneratePlan}>
-                    Shuffle circuit
-                  </button>
-                )}
+                <button className="ghost-button" type="button" onClick={regeneratePlan}>
+                  Shuffle circuit
+                </button>
                 {missingMovements.length > 0 && (
-                  <p className="warning">Some groups have no matching equipment.</p>
+                  <p className="warning">Some routine slots could not be filled.</p>
                 )}
               </div>
             )}
+
           </div>
         </section>
       </main>
