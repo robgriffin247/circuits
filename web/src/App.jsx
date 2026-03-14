@@ -44,11 +44,18 @@ function buildRoutines(raw) {
   return Object.entries(raw ?? {}).map(([id, value]) => {
     const entry = Array.isArray(value) ? value[0] : value;
     const maxSidedMovements = Number(entry?.max_sided_movements);
+    const rawGroups = entry?.target_groups ?? entry?.movements ?? [];
+    const movements = (rawGroups ?? []).map((group) => {
+      if (group && typeof group === "object" && !Array.isArray(group) && group.movements) {
+        return group.movements;
+      }
+      return group;
+    });
 
     return {
       id,
       name: entry?.name ?? id,
-      movements: (entry?.movements ?? []).map((slot) => (Array.isArray(slot) ? slot : [slot])),
+      movements: (movements ?? []).map((slot) => (Array.isArray(slot) ? slot : [slot])),
       rotations: Number(entry?.rotations ?? 1),
       maxSidedMovements: Number.isFinite(maxSidedMovements) ? maxSidedMovements : Infinity
     };
@@ -381,7 +388,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (status === "running") return;
+    if (status !== "idle") return;
     regeneratePlan();
   }, [routine, movementsById, equipmentSet, status]);
 
@@ -460,6 +467,16 @@ export default function App() {
 
   const handleSkip = (direction) => {
     if (steps.length === 0) return;
+    if (direction > 0 && stepIndex + direction >= steps.length) {
+      setStatus("stopped");
+      setHasFinished(true);
+      setTimeRemaining(0);
+      setStepIndex(Math.max(steps.length - 1, 0));
+      advancePendingRef.current = false;
+      endTimeRef.current = null;
+      lastRemainingRef.current = null;
+      return;
+    }
     const nextIndex = Math.min(Math.max(stepIndex + direction, 0), steps.length - 1);
     setStepIndex(nextIndex);
     setTimeRemaining(steps[nextIndex]?.duration ?? 0);
@@ -702,7 +719,10 @@ export default function App() {
 
             <div className="card">
               <h3>Equipment</h3>
-              <p className="hint">Select what you have available to filter movements.</p>
+              <p className="hint">
+                Select what you have available to filter movements. Items with checkmarks are
+                required for the planned workout.
+              </p>
               <div className="equipment-grid">
                 {EQUIPMENT_OPTIONS.map((item) => {
                   const pillClasses = ["pill"];
@@ -775,24 +795,26 @@ export default function App() {
                   <div className="timer">{remainingDisplay}</div>
                   {displayCues ? <p className="sub-message cues">{displayCues}</p> : null}
                 </div>
-                {(status === "paused" || hasFinished) && (
-                  <div className="session-action">
-                    <button className="ghost-button" type="button" onClick={handleStartOver}>
-                      Start over
-                    </button>
-                  </div>
-                )}
-                <div
-                  className="progress"
-                  role="progressbar"
-                  aria-valuemin={0}
-                  aria-valuemax={1}
-                  aria-valuenow={progressValue}
-                >
+                <div className="session-footer">
+                  {(status === "paused" || hasFinished) && (
+                    <div className="session-action">
+                      <button className="ghost-button" type="button" onClick={handleStartOver}>
+                        Start over
+                      </button>
+                    </div>
+                  )}
                   <div
-                    className="progress-fill"
-                    style={{ width: `${Math.min(Math.max(progressValue, 0), 1) * 100}%` }}
-                  />
+                    className="progress"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={1}
+                    aria-valuenow={progressValue}
+                  >
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${Math.min(Math.max(progressValue, 0), 1) * 100}%` }}
+                    />
+                  </div>
                 </div>
               </div>
             ) : hasFinished ? (
@@ -800,6 +822,9 @@ export default function App() {
                 <div className="flare flare-one" aria-hidden="true" />
                 <div className="flare flare-two" aria-hidden="true" />
                 <div className="flare flare-three" aria-hidden="true" />
+                <div className="flare flare-four" aria-hidden="true" />
+                <div className="flare flare-five" aria-hidden="true" />
+                <div className="flare flare-six" aria-hidden="true" />
                 <p className="label">Finished</p>
                 <h2>Finished!</h2>
                 <p className="sub-message cues">Circuit complete. Here&apos;s what you just worked through.</p>

@@ -1,8 +1,0 @@
-running_1:
-  - name: "Running Injury Prevention"
-    movement_groups: ["posterior_chain_strength", "knee_stability"]
-    rotations: 3
-running_2:
-  - name: "Runners Strength"
-    movement_groups: ["knee_strength", "posterior_chain_strength"]
-    rotations: 2

@@ -265,12 +265,20 @@ single_leg_calf_raise:
     cues: Complete one side before switching, go all the way up and all the way down, and pause at the top.
 
 single_leg_calf_raise_dumbbell:
-  - name: Weighted Single Leg Calf Raise
+  - name: DB Single Leg Calf Raise
     category: ankle_stability
     category_name: Ankle Stability
     side: true
     requires: ["dumbbell"]
     cues: Hold one dumbbell in the hand opposite the working leg, move through a full range, and finish one side before switching.
+
+single_leg_calf_raise_kettlebell:
+  - name: KB Single Leg Calf Raise
+    category: ankle_stability
+    category_name: Ankle Stability
+    side: true
+    requires: ["dumbbell"]
+    cues: Hold a kettlebell in the hand opposite the working leg, move through a full range, and finish one side before switching.
 
 single_leg_lift:
   - name: Single Leg Lift
@@ -347,13 +355,6 @@ touchdown_squat_kettlebell:
     side: true
     requires: ["step_box", "kettlebell"]
     cues: Hold one kettlebell in the hand opposite the working leg, touch the box softly, and complete one side at a time.
-
-v_up:
-  - name: V-Up
-    category: core_strength
-    category_name: Core Strength
-    side: false
-    cues: Reach hands and feet toward each other together, then lower with control instead of flopping back down.
 
 wall_sit:
   - name: Wall Sit
