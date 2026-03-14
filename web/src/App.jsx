@@ -605,8 +605,7 @@ export default function App() {
     totalDuration > 0 ? (elapsedBeforeCurrent + currentElapsed) / totalDuration : 0;
   const projectedDuration = formatTotalDuration(totalDuration);
 
-  const displayLabel =
-    status === "paused" ? `Paused - ${currentStep?.label ?? "Now"}` : currentStep?.label ?? "Now";
+  const displayLabel = currentStep?.label ?? "Now";
   const displayHeadline = currentStep?.headline ?? "Ready";
   const displayCues = currentStep?.cues ?? "";
 

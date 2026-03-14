@@ -278,7 +278,7 @@ main {
 
 .progress {
   width: 100%;
-  height: 10px;
+  height: 24px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.25);
   overflow: hidden;
@@ -393,6 +393,10 @@ main {
   flex-shrink: 0;
 }
 
+.session-footer .progress {
+  margin-top: auto;
+}
+
 .finished-view {
   position: relative;
   height: 100%;
@@ -415,16 +419,19 @@ main {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.93);
+  color: rgba(255, 255, 255, 0.9);
   overflow: auto;
+  font-size: 1rem;
   list-style: none;
+  align-items: center;
+  width: 100%;
+  max-height: 220px;
 }
 
 .finished-list li {
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.11);
-  backdrop-filter: blur(6px);
+  padding: 0;
+  background: none;
+  border-radius: 0;
 }
 
 .flare {
@@ -924,11 +931,9 @@ select {
   .panel {
     min-height: 640px;
     height: 640px;
-  }
-
-  .panel.idle {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-bottom: 22px;
   }
 
   .panel-content {
