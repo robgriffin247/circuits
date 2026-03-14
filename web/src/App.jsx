@@ -634,7 +634,7 @@ export default function App() {
     <div className="app">
       <header>
         <div>
-          <h1>s3:kit</h1>
+          <h1>sə:kit</h1>
           <p className="kicker">Circuit Training App</p>
         </div>
         <div className="status" />
