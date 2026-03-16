@@ -1133,6 +1133,11 @@ select {
     text-align: center;
     align-items: center;
     max-height: 260px;
+    font-size: 0.9rem;
+  }
+
+  .planned-duration .label {
+    display: none;
   }
 
   .columns {
