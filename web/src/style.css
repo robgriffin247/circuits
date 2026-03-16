@@ -1132,12 +1132,16 @@ select {
   .planned-list {
     text-align: center;
     align-items: center;
-    max-height: 260px;
-    font-size: 0.9rem;
+    max-height: 320px;
+    font-size: 0.85rem;
   }
 
   .planned-duration .label {
     display: none;
+  }
+
+  .planned-duration {
+    margin-top: 28px;
   }
 
   .columns {
