@@ -33,9 +33,9 @@ cyclist_power_builder:
 whole_body_conditioner:
   name: "Whole Body Conditioner"
   description: "A whole body workout to build mobility and strength to prevent injury and improve conditioning."
-  rotations: 2
-  movement_duration: 60
-  rest_duration: 30
+  rotations: 3
+  movement_duration: 40
+  rest_duration: 20
   stations:
     - core_stability
     - posterior_chain_strength
