@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { load as loadYaml } from "js-yaml";
 import movementsYamlText from "../movements.yml?raw";
 import routinesYamlText from "../routines.yml?raw";
+import stationsYamlText from "../stations.yml?raw";
 
 const DEFAULT_START_DURATION = 10;
 const DEFAULT_MOVE_DURATION = 45;
@@ -13,7 +14,9 @@ const EQUIPMENT_OPTIONS = [
   { id: "dumbbell", label: "Dumbbells", defaultSelected: true },
   { id: "olympic_bar", label: "Barbell", defaultSelected: false },
   { id: "resistance_band", label: "Resistance Band", defaultSelected: true },
-  { id: "step_box", label: "Step/Box", defaultSelected: true }
+  { id: "step_box", label: "Step/Box", defaultSelected: true },
+  { id: "balance_board", label: "Balance Board", defaultSelected: true },
+  { id: "ab_roller", label: "Ab Roller", defaultSelected: true }
 ];
 
 const STEP_TYPES = {
@@ -31,11 +34,21 @@ function buildMovements(raw) {
     return {
       id,
       name: entry?.name ?? id,
-      category: entry?.category ?? "",
-      categoryName: entry?.category_name ?? entry?.category ?? "",
       side: Boolean(entry?.side),
       requires: entry?.requires ?? [],
       cues: entry?.cues ?? ""
+    };
+  });
+}
+
+function buildStations(raw) {
+  return Object.entries(raw ?? {}).map(([id, value]) => {
+    const entry = Array.isArray(value) ? value[0] : value;
+    return {
+      id,
+      name: entry?.name ?? id,
+      description: entry?.description ?? "",
+      movements: entry?.movements ?? []
     };
   });
 }
@@ -44,19 +57,18 @@ function buildRoutines(raw) {
   return Object.entries(raw ?? {}).map(([id, value]) => {
     const entry = Array.isArray(value) ? value[0] : value;
     const maxSidedMovements = Number(entry?.max_sided_movements);
-    const rawGroups = entry?.target_groups ?? entry?.movements ?? [];
-    const movements = (rawGroups ?? []).map((group) => {
-      if (group && typeof group === "object" && !Array.isArray(group) && group.movements) {
-        return group.movements;
-      }
-      return group;
-    });
+    const stations = entry?.stations ?? [];
+    const movementDuration = Number(entry?.movement_duration);
+    const restDuration = Number(entry?.rest_duration);
 
     return {
       id,
       name: entry?.name ?? id,
-      movements: (movements ?? []).map((slot) => (Array.isArray(slot) ? slot : [slot])),
+      description: entry?.description ?? "",
+      stations: stations ?? [],
       rotations: Number(entry?.rotations ?? 1),
+      movementDuration: Number.isFinite(movementDuration) ? movementDuration : null,
+      restDuration: Number.isFinite(restDuration) ? restDuration : null,
       maxSidedMovements: Number.isFinite(maxSidedMovements) ? maxSidedMovements : Infinity
     };
   });
@@ -77,20 +89,33 @@ function meetsRequirements(requirements, equipmentSet) {
   });
 }
 
-function buildPlan(movementsById, movementSlots, equipmentSet, maxSidedMovements) {
+function buildPlan(movementsById, stationsById, stationIds, equipmentSet, maxSidedMovements) {
   let sidedCount = 0;
 
-  return movementSlots.map((movementIds, index) => {
+  return stationIds.map((stationId, index) => {
+    const station = stationsById[stationId];
+    if (!station) {
+      return {
+        groupId: `station-${index}`,
+        groupName: "Station",
+        movement: null,
+        options: [],
+        selectedIndex: -1,
+        reason: "Station not found"
+      };
+    }
+
+    const movementIds = Array.isArray(station.movements) ? station.movements : [];
     const candidates = movementIds.map((movementId) => movementsById[movementId]).filter(Boolean);
 
     if (candidates.length === 0) {
       return {
-        groupId: `slot-${index}`,
-        groupName: "Movement",
+        groupId: station.id,
+        groupName: station.name || "Station",
         movement: null,
         options: [],
         selectedIndex: -1,
-        reason: "Movement not found"
+        reason: movementIds.length === 0 ? "No movements assigned" : "Movement not found"
       };
     }
 
@@ -98,8 +123,8 @@ function buildPlan(movementsById, movementSlots, equipmentSet, maxSidedMovements
 
     if (matching.length === 0) {
       return {
-        groupId: `slot-${index}`,
-        groupName: candidates[0].categoryName || "Movement",
+        groupId: station.id,
+        groupName: station.name || "Station",
         movement: null,
         options: [],
         selectedIndex: -1,
@@ -111,8 +136,8 @@ function buildPlan(movementsById, movementSlots, equipmentSet, maxSidedMovements
 
     if (available.length === 0) {
       return {
-        groupId: `slot-${index}`,
-        groupName: candidates[0].categoryName || "Movement",
+        groupId: station.id,
+        groupName: station.name || "Station",
         movement: null,
         options: [],
         selectedIndex: -1,
@@ -127,8 +152,8 @@ function buildPlan(movementsById, movementSlots, equipmentSet, maxSidedMovements
     }
 
     return {
-      groupId: `slot-${index}`,
-      groupName: candidates[0].categoryName || "Movement",
+      groupId: station.id,
+      groupName: station.name || "Station",
       movement: selectedMovement,
       options: matching,
       selectedIndex,
@@ -273,6 +298,7 @@ function clamp(value, min, max) {
 
 export default function App() {
   const [movements, setMovements] = useState([]);
+  const [stations, setStations] = useState([]);
   const [routines, setRoutines] = useState([]);
   const [selectedRoutineId, setSelectedRoutineId] = useState("");
   const [equipment, setEquipment] = useState(() =>
@@ -310,14 +336,17 @@ export default function App() {
   useEffect(() => {
     try {
       const movementList = buildMovements(loadYaml(movementsYamlText));
+      const stationList = buildStations(loadYaml(stationsYamlText));
       const routinesList = buildRoutines(loadYaml(routinesYamlText));
       setMovements(movementList);
+      setStations(stationList);
       setRoutines(routinesList);
       if (routinesList.length > 0) {
         setSelectedRoutineId(routinesList[0].id);
       }
     } catch {
       setMovements([]);
+      setStations([]);
       setRoutines([]);
     }
   }, []);
@@ -333,6 +362,13 @@ export default function App() {
       return acc;
     }, {});
   }, [movements]);
+
+  const stationsById = useMemo(() => {
+    return stations.reduce((acc, station) => {
+      acc[station.id] = station;
+      return acc;
+    }, {});
+  }, [stations]);
 
   const equipmentSet = useMemo(() => {
     const selected = new Set(["bodyweight"]);
@@ -359,6 +395,11 @@ export default function App() {
   useEffect(() => {
     if (!routine) return;
     setRotations(routine.rotations);
+    setDurations((prev) => ({
+      ...prev,
+      move: routine.movementDuration ?? prev.move,
+      rest: routine.restDuration ?? prev.rest
+    }));
   }, [routine]);
 
   useEffect(() => {
@@ -380,7 +421,8 @@ export default function App() {
 
     const nextPlan = buildPlan(
       movementsById,
-      routine.movements,
+      stationsById,
+      routine.stations ?? [],
       equipmentSet,
       routine.maxSidedMovements
     );
@@ -390,7 +432,7 @@ export default function App() {
   useEffect(() => {
     if (status !== "idle") return;
     regeneratePlan();
-  }, [routine, movementsById, equipmentSet, status]);
+  }, [routine, movementsById, stationsById, equipmentSet, status]);
 
   useEffect(() => {
     if (status === "running") return;
@@ -634,7 +676,7 @@ export default function App() {
     <div className="app">
       <header>
         <div>
-          <h1>sə:kit</h1>
+          <h1>se:kit</h1>
           <p className="kicker">Circuit Training App</p>
         </div>
         <div className="status" />
@@ -667,6 +709,9 @@ export default function App() {
                     </span>
                   </span>
                 </label>
+                {routine?.description ? (
+                  <p className="routine-description hint">{routine.description}</p>
+                ) : null}
               </div>
             </div>
 
@@ -784,6 +829,17 @@ export default function App() {
               </button>
             </div>
 
+            {!isActive && !hasFinished && (
+              <div className="panel-footer panel-footer-top">
+                <button className="ghost-button" type="button" onClick={regeneratePlan}>
+                  Shuffle circuit
+                </button>
+                {missingMovements.length > 0 && (
+                  <p className="warning">Some routine slots could not be filled.</p>
+                )}
+              </div>
+            )}
+
             {isActive ? (
               <div className="panel-content session-view">
                 <div className="session-top">
@@ -883,17 +939,6 @@ export default function App() {
                     </div>
                   ) : null}
                 </div>
-              </div>
-            )}
-
-            {!isActive && !hasFinished && (
-              <div className="panel-footer">
-                <button className="ghost-button" type="button" onClick={regeneratePlan}>
-                  Shuffle circuit
-                </button>
-                {missingMovements.length > 0 && (
-                  <p className="warning">Some routine slots could not be filled.</p>
-                )}
               </div>
             )}
 

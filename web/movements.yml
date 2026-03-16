@@ -1,364 +1,333 @@
 barbell_back_squat:
-  - name: Bar Back Squat
-    category: knee_strength
-    category_name: Knee Strength
-    side: false
-    requires: ["olympic_bar"]
-    cues: Rest the bar across your upper traps, brace before each rep, and keep the bar stacked over mid-foot.
+  name: Bar Back Squat
+  side: false
+  requires: ["olympic_bar"]
+  cues: Rest the bar across your upper traps, brace before each rep, and keep the bar stacked over mid-foot.
 
 bird_dog:
-  - name: Bird Dog
-    category: core_stability
-    category_name: Core Stability
-    side: false
-    cues: Alternate opposite arm and leg, keep your hips level, and reach long rather than lifting high.
+  name: Bird Dog
+  side: false
+  cues: Alternate opposite arm and leg, keep your hips level, and reach long rather than lifting high.
 
 bulgarian_split_barbell:
-  - name: Bar Bulgarian Split Squat
-    category: knee_stability
-    category_name: Knee Stability
-    side: true
-    requires: ["step_box", "olympic_bar"]
-    cues: Set the bar across your upper back, keep your torso quiet, and complete all reps on one leg before changing sides.
+  name: Bar Bulgarian Split Squat
+  side: true
+  requires: ["step_box", "olympic_bar"]
+  cues: Set the bar across your upper back, keep your torso quiet, and complete all reps on one leg before changing sides.
 
 bulgarian_split_bodyweight:
-  - name: Bulgarian Split Squat
-    category: knee_stability
-    category_name: Knee Stability
-    side: true
-    requires: ["step_box"]
-    cues: Rear foot elevated, front shin mostly vertical, and finish all reps on one side before switching.
+  name: Bulgarian Split Squat
+  side: true
+  requires: ["step_box"]
+  cues: Rear foot elevated, front shin mostly vertical, and finish all reps on one side before switching.
 
 bulgarian_split_dumbbell:
-  - name: DB Bulgarian Split Squat
-    category: knee_stability
-    category_name: Knee Stability
-    side: true
-    requires: ["step_box", "dumbbell"]
-    cues: Hold one dumbbell in the hand opposite the front leg, move slowly on the way down, and finish one side before switching.
+  name: DB Bulgarian Split Squat
+  side: true
+  requires: ["step_box", "dumbbell"]
+  cues: Hold one dumbbell in the hand opposite the front leg, move slowly on the way down, and finish one side before switching.
 
 bulgarian_split_kettlebell:
-  - name: KB Bulgarian Split Squat
-    category: knee_stability
-    category_name: Knee Stability
-    side: true
-    requires: ["step_box", "kettlebell"]
-    cues: Hold one kettlebell in the hand opposite the front leg, stay stacked over the front foot, and complete one side at a time.
+  name: KB Bulgarian Split Squat
+  side: true
+  requires: ["step_box", "kettlebell"]
+  cues: Hold one kettlebell in the hand opposite the front leg, stay stacked over the front foot, and complete one side at a time.
 
 dead_bug:
-  - name: Dead Bug
-    category: core_stability
-    category_name: Core Stability
-    side: false
-    cues: Alternate opposite arm and leg, press your lower back into the floor, and move slowly enough that nothing shifts.
+  name: Dead Bug
+  side: false
+  cues: Alternate opposite arm and leg, press your lower back into the floor, and move slowly enough that nothing shifts.
 
 deadlift_barbell:
-  - name: Bar Deadlift
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    requires: ["olympic_bar"]
-    cues: Set the bar over mid-foot, pull the slack out first, and drive through the floor while keeping the bar close.
+  name: Bar Deadlift
+  side: false
+  requires: ["olympic_bar"]
+  cues: Set the bar over mid-foot, pull the slack out first, and drive through the floor while keeping the bar close.
 
 deadlift_bodyweight:
-  - name: Hinge
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    cues: Hinge at the hips, keep your back flat, and load the hamstrings before standing tall.
+  name: Hinge
+  side: false
+  cues: Hinge at the hips, keep your back flat, and load the hamstrings before standing tall.
 
 deadlift_dumbbell:
-  - name: DB Deadlift
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    requires: ["dumbbell"]
-    cues: Hold a dumbbell in each hand at your sides, keep them close to your legs, and stand tall without shrugging.
+  name: DB Deadlift
+  side: false
+  requires: ["dumbbell"]
+  cues: Hold a dumbbell in each hand at your sides, keep them close to your legs, and stand tall without shrugging.
 
 deadlift_kettlebell:
-  - name: KB Deadlift
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    requires: ["kettlebell"]
-    cues: Hold the kettlebell between your feet with both hands, wedge into the floor, and stand up by pushing the ground away.
+  name: KB Deadlift
+  side: false
+  requires: ["kettlebell"]
+  cues: Hold the kettlebell between your feet with both hands, wedge into the floor, and stand up by pushing the ground away.
+
+farmers_carry_dumbbell:
+  name: DB Farmers Carry
+  side: false
+  requires: ["dumbbell"]
+  cues: Hold a dumbbell in each hand, stand tall, brace the core, and walk with controlled steps — don't let the load pull your shoulders down.
+
+farmers_carry_kettlebell:
+  name: KB Farmers Carry
+  side: false
+  requires: ["kettlebell"]
+  cues: Hold a kettlebell in each hand, pack the shoulders down, and keep your gait smooth and upright throughout.
 
 glute_bridge:
-  - name: Glute Bridge
-    category: hip_mobility
-    category_name: Hip Mobility
-    side: false
-    cues: Drive through the heels, squeeze the glutes at the top, and avoid arching the lower back.
+  name: Glute Bridge
+  side: false
+  cues: Drive through the heels, squeeze the glutes at the top, and avoid arching the lower back.
 
 glute_bridge_dumbbell:
-  - name: DB Glute Bridge
-    category: hip_mobility
-    category_name: Hip Mobility
-    side: false
-    requires: ["dumbbell"]
-    cues: Rest the dumbbell horizontally across the hips, keep the ribs down, and squeeze hard at the top.
+  name: DB Glute Bridge
+  side: false
+  requires: ["dumbbell"]
+  cues: Rest the dumbbell horizontally across the hips, keep the ribs down, and squeeze hard at the top.
 
 glute_bridge_kettlebell:
-  - name: KB Glute Bridge
-    category: hip_mobility
-    category_name: Hip Mobility
-    side: false
-    requires: ["kettlebell"]
-    cues: Rest the kettlebell across the hips, pin it in place with your hands, and drive straight up through the heels.
+  name: KB Glute Bridge
+  side: false
+  requires: ["kettlebell"]
+  cues: Rest the kettlebell across the hips, pin it in place with your hands, and drive straight up through the heels.
 
 goblet_squat_dumbbell:
-  - name: DB Goblet Squat
-    category: knee_strength
-    category_name: Knee Strength
-    side: false
-    requires: ["dumbbell"]
-    cues: Hold one dumbbell vertically at your chest in a goblet position, keep the load close, and drive up through the whole foot.
+  name: DB Goblet Squat
+  side: false
+  requires: ["dumbbell"]
+  cues: Hold one dumbbell vertically at your chest in a goblet position, keep the load close, and drive up through the whole foot.
 
 goblet_squat_kettlebell:
-  - name: KB Goblet Squat
-    category: knee_strength
-    category_name: Knee Strength
-    side: false
-    requires: ["kettlebell"]
-    cues: Hold the bell in a goblet position tight to your chest, elbows inside your knees, and stay tall through the torso.
+  name: KB Goblet Squat
+  side: false
+  requires: ["kettlebell"]
+  cues: Hold the bell in a goblet position tight to your chest, elbows inside your knees, and stay tall through the torso.
 
 hip_90_90:
-  - name: 90/90 Hip Stretch
-    category: hip_mobility
-    category_name: Hip Mobility
-    side: true
-    cues: Sit tall, fold over the front shin, and spend time on one side before switching.
+  name: 90/90 Hip Stretch
+  side: true
+  cues: Sit tall, fold over the front shin, and spend time on one side before switching.
 
 hip_flexor_lunge:
-  - name: Hip Flexor Lunge Stretch
-    category: hip_mobility
-    category_name: Hip Mobility
-    side: true
-    cues: Tuck the tailbone first, then glide forward into the stretch and complete one side before switching.
+  name: Hip Flexor Lunge Stretch
+  side: true
+  cues: Tuck the tailbone first, then glide forward into the stretch and complete one side before switching.
 
 hollow_hold:
-  - name: Hollow Hold
-    category: core_strength
-    category_name: Core Strength
-    side: false
-    cues: Arms overhead, legs low, ribs tucked down, and breathe without letting your lower back lift.
+  name: Hollow Hold
+  side: false
+  cues: Arms overhead, legs low, ribs tucked down, and breathe without letting your lower back lift.
 
 leg_lift:
-  - name: Leg Lift
-    category: core_strength
-    category_name: Core Strength
-    side: false
-    cues: Keep your lower back pressed into the floor, lower your legs slowly, and stop before your back peels off the ground.
+  name: Leg Lift
+  side: false
+  cues: Keep your lower back pressed into the floor, lower your legs slowly, and stop before your back peels off the ground.
 
 pallof_press:
-  - name: Pallof Press
-    category: core_stability
-    category_name: Core Stability
-    side: true
-    requires: ["resistance_band"]
-    cues: Stand side-on to the band anchor, press straight out, and complete one side before turning around.
+  name: Pallof Press
+  side: true
+  requires: ["resistance_band"]
+  cues: Stand side-on to the band anchor, press straight out, and complete one side before turning around.
 
 plank:
-  - name: Plank
-    category: core_stability
-    category_name: Core Stability
-    side: false
-    cues: Squeeze glutes and quads, keep one straight line from shoulders to heels, and do not let the hips sag.
+  name: Plank
+  side: false
+  cues: Squeeze glutes and quads, keep one straight line from shoulders to heels, and do not let the hips sag.
 
 pogos:
-  - name: Pogo Jumps
-    category: ankle_stability
-    category_name: Ankle Stability
-    side: false
-    cues: Stay on the forefoot, keep ground contact short, and think springy ankles rather than a deep knee bend.
+  name: Pogo Jumps
+  side: false
+  cues: Stay on the forefoot, keep ground contact short, and think springy ankles rather than a deep knee bend.
 
 push_up:
-  - name: Push Up
-    category: upper_back_strength
-    category_name: Upper Back Strength
-    side: false
-    cues: Hands just outside shoulder width, body rigid from head to heel, and lower under control.
+  name: Push Up
+  side: false
+  cues: Hands just outside shoulder width, body rigid from head to heel, and lower under control.
 
 rdl_barbell:
-  - name: Bar Romanian Deadlift
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    requires: ["olympic_bar"]
-    cues: Hold the bar in your hands, unlock the knees, push the hips back, and keep the lats tight the whole rep.
+  name: Bar Romanian Deadlift
+  side: false
+  requires: ["olympic_bar"]
+  cues: Hold the bar in your hands, unlock the knees, push the hips back, and keep the lats tight the whole rep.
 
 rdl_bodyweight:
-  - name: Romanian Deadlift
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    cues: Soft bend in the knees, push the hips back, and stop when the hamstrings are fully loaded.
+  name: Romanian Deadlift
+  side: false
+  cues: Soft bend in the knees, push the hips back, and stop when the hamstrings are fully loaded.
 
 rdl_dumbbell:
-  - name: DB Romanian Deadlift
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    requires: ["dumbbell"]
-    cues: Hold a dumbbell in each hand at your sides, slide them down the thighs, and return once the hamstrings are loaded.
+  name: DB Romanian Deadlift
+  side: false
+  requires: ["dumbbell"]
+  cues: Hold a dumbbell in each hand at your sides, slide them down the thighs, and return once the hamstrings are loaded.
 
 rdl_kettlebell:
-  - name: KB Romanian Deadlift
-    category: posterior_chain_strength
-    category_name: Posterior Chain Strength
-    side: false
-    requires: ["kettlebell"]
-    cues: Hold the kettlebell with both hands in front of you, keep it close, and reach the hips back without rounding.
+  name: KB Romanian Deadlift
+  side: false
+  requires: ["kettlebell"]
+  cues: Hold the kettlebell with both hands in front of you, keep it close, and reach the hips back without rounding.
 
 reverse_lunge_barbell:
-  - name: Bar Reverse Lunge
-    category: knee_stability
-    category_name: Knee Stability
-    side: false
-    requires: ["olympic_bar"]
-    cues: Keep the bar on your upper back, alternate sides rep to rep, and stay upright as you step back.
+  name: Bar Reverse Lunge
+  side: false
+  requires: ["olympic_bar"]
+  cues: Keep the bar on your upper back, alternate sides rep to rep, and stay upright as you step back.
 
 reverse_lunge_bodyweight:
-  - name: Reverse Lunge
-    category: knee_stability
-    category_name: Knee Stability
-    side: false
-    cues: Alternate sides rep to rep, step back with control, and keep the front knee tracking over the foot.
+  name: Reverse Lunge
+  side: false
+  cues: Alternate sides rep to rep, step back with control, and keep the front knee tracking over the foot.
 
 reverse_lunge_dumbbell:
-  - name: DB Reverse Lunge
-    category: knee_stability
-    category_name: Knee Stability
-    side: false
-    requires: ["dumbbell"]
-    cues: Alternate sides rep to rep while holding one dumbbell in the hand opposite the front leg for each rep.
+  name: DB Reverse Lunge
+  side: false
+  requires: ["dumbbell"]
+  cues: Alternate sides rep to rep while holding one dumbbell in the hand opposite the front leg for each rep.
 
 reverse_lunge_kettlebell:
-  - name: KB Reverse Lunge
-    category: knee_stability
-    category_name: Knee Stability
-    side: false
-    requires: ["kettlebell"]
-    cues: Alternate sides rep to rep while holding one kettlebell in the hand opposite the front leg for each rep.
+  name: KB Reverse Lunge
+  side: false
+  requires: ["kettlebell"]
+  cues: Alternate sides rep to rep while holding one kettlebell in the hand opposite the front leg for each rep.
+
+shoulder_press_dumbbell:
+  name: DB Shoulder Press
+  side: false
+  requires: ["dumbbell"]
+  cues: Start at ear height, press straight up without flaring the ribs, and lower under control.
+
+shoulder_press_kettlebell:
+  name: KB Shoulder Press
+  side: false
+  requires: ["kettlebell"]
+  cues: Clean to the rack position first, press straight up, and keep the wrist stacked over the elbow throughout.
+
+shoulder_press_single_arm_dumbbell:
+  name: Single Arm DB Shoulder Press
+  side: true
+  requires: ["dumbbell"]
+  cues: Press one side at a time, brace against the rotation, and complete all reps before switching sides.
+
+shoulder_press_single_arm_kettlebell:
+  name: Single Arm KB Shoulder Press
+  side: true
+  requires: ["kettlebell"]
+  cues: Clean to rack, press straight up, keep the core braced against the offset load, and finish one side before switching.
 
 single_arm_row_dumbbell:
-  - name: Single Arm DB Row
-    category: upper_back_strength
-    category_name: Upper Back Strength
-    side: true
-    requires: ["dumbbell"]
-    cues: Brace with the free hand on your thigh or a bench, drive the elbow back, and finish one side before switching.
+  name: Single Arm DB Row
+  side: true
+  requires: ["dumbbell"]
+  cues: Brace with the free hand on your thigh or a bench, drive the elbow back, and finish one side before switching.
 
 single_arm_row_kettlebell:
-  - name: Single Arm KB Row
-    category: upper_back_strength
-    category_name: Upper Back Strength
-    side: true
-    requires: ["kettlebell"]
-    cues: Brace with the free hand on your thigh or a bench, row with one arm, and complete one side before switching.
+  name: Single Arm KB Row
+  side: true
+  requires: ["kettlebell"]
+  cues: Brace with the free hand on your thigh or a bench, row with one arm, and complete one side before switching.
 
 single_leg_calf_raise:
-  - name: Single Leg Calf Raise
-    category: ankle_stability
-    category_name: Ankle Stability
-    side: true
-    cues: Complete one side before switching, go all the way up and all the way down, and pause at the top.
+  name: Single Leg Calf Raise
+  side: true
+  cues: Complete one side before switching, go all the way up and all the way down, and pause at the top.
 
 single_leg_calf_raise_dumbbell:
-  - name: DB Single Leg Calf Raise
-    category: ankle_stability
-    category_name: Ankle Stability
-    side: true
-    requires: ["dumbbell"]
-    cues: Hold one dumbbell in the hand opposite the working leg, move through a full range, and finish one side before switching.
+  name: DB Single Leg Calf Raise
+  side: true
+  requires: ["dumbbell"]
+  cues: Hold one dumbbell in the hand opposite the working leg, move through a full range, and finish one side before switching.
 
 single_leg_calf_raise_kettlebell:
-  - name: KB Single Leg Calf Raise
-    category: ankle_stability
-    category_name: Ankle Stability
-    side: true
-    requires: ["dumbbell"]
-    cues: Hold a kettlebell in the hand opposite the working leg, move through a full range, and finish one side before switching.
+  name: KB Single Leg Calf Raise
+  side: true
+  requires: ["kettlebell"]
+  cues: Hold a kettlebell in the hand opposite the working leg, move through a full range, and finish one side before switching.
+
+single_leg_deadlift_bodyweight:
+  name: Single Leg Deadlift
+  side: true
+  cues: Hinge at the hip, let the rear leg float back as a counterbalance, keep the hips square, and complete one side before switching.
+
+single_leg_deadlift_dumbbell:
+  name: DB Single Leg Deadlift
+  side: true
+  requires: ["dumbbell"]
+  cues: Hold a dumbbell in the hand opposite the standing leg, hinge slowly, keep the hips level, and finish one side before switching.
+
+single_leg_deadlift_kettlebell:
+  name: KB Single Leg Deadlift
+  side: true
+  requires: ["kettlebell"]
+  cues: Hold the kettlebell in the hand opposite the standing leg, reach it toward the floor as you hinge, and return to standing before switching sides.
 
 single_leg_lift:
-  - name: Single Leg Lift
-    category: core_strength
-    category_name: Core Strength
-    side: false
-    cues: Alternate legs rep to rep, keep the non-working leg vertical, and brace hard so your low back stays pinned down.
+  name: Single Leg Lift
+  side: false
+  cues: Alternate legs rep to rep, keep the non-working leg vertical, and brace hard so your low back stays pinned down.
 
 single_leg_pogos:
-  - name: Single-Leg Pogo Jumps
-    category: ankle_stability
-    category_name: Ankle Stability
-    side: true
-    cues: Minimal knee bend, stay stiff through the ankle, and complete one side before switching.
+  name: Single-Leg Pogo Jumps
+  side: true
+  cues: Minimal knee bend, stay stiff through the ankle, and complete one side before switching.
 
 squat_bodyweight:
-  - name: Squat
-    category: knee_strength
-    category_name: Knee Strength
-    side: false
-    cues: Chest up, knees out, break parallel if you can, and own the bottom position.
+  name: Squat
+  side: false
+  cues: Chest up, knees out, break parallel if you can, and own the bottom position.
 
 squat_jump:
-  - name: Squat Jump
-    category: knee_strength
-    category_name: Knee Strength
-    side: false
-    cues: Load through the hips, explode vertically, and land softly with bent knees so you absorb the landing.
+  name: Squat Jump
+  side: false
+  cues: Load through the hips, explode vertically, and land softly with bent knees so you absorb the landing.
 
 step_up_bodyweight:
-  - name: Step Up
-    category: knee_strength
-    category_name: Knee Strength
-    side: true
-    requires: ["step_box"]
-    cues: Complete one side before switching, drive through the heel of the top leg, and do not push off the floor.
+  name: Step Up
+  side: true
+  requires: ["step_box"]
+  cues: Complete one side before switching, drive through the heel of the top leg, and do not push off the floor.
 
 step_up_dumbbell:
-  - name: DB Step Up
-    category: knee_strength
-    category_name: Knee Strength
-    side: true
-    requires: ["step_box", "dumbbell"]
-    cues: Hold one dumbbell in the hand opposite the working leg, control the lowering phase, and switch sides only after the set.
+  name: DB Step Up
+  side: true
+  requires: ["step_box", "dumbbell"]
+  cues: Hold one dumbbell in the hand opposite the working leg, control the lowering phase, and switch sides only after the set.
 
 step_up_kettlebell:
-  - name: KB Step Up
-    category: knee_strength
-    category_name: Knee Strength
-    side: true
-    requires: ["step_box", "kettlebell"]
-    cues: Hold one kettlebell in the hand opposite the working leg, stay tall, and make the top leg do the work.
+  name: KB Step Up
+  side: true
+  requires: ["step_box", "kettlebell"]
+  cues: Hold one kettlebell in the hand opposite the working leg, stay tall, and make the top leg do the work.
+
+suitcase_carry_dumbbell:
+  name: DB Suitcase Carry
+  side: true
+  requires: ["dumbbell"]
+  cues: Hold one dumbbell at your side, resist the lean, keep the hips level, and complete one side before switching.
+
+suitcase_carry_kettlebell:
+  name: KB Suitcase Carry
+  side: true
+  requires: ["kettlebell"]
+  cues: Hold one kettlebell at your side, brace hard against the sideways pull, stay tall, and finish one side before switching.
 
 touchdown_squat_bodyweight:
-  - name: Touchdown Squat
-    category: knee_stability
-    category_name: Knee Stability
-    side: true
-    requires: ["step_box"]
-    cues: Tap the heel lightly to the box, keep the working knee tracking out, and finish one side before switching.
+  name: Touchdown Squat
+  side: true
+  requires: ["step_box"]
+  cues: Tap the heel lightly to the box, keep the working knee tracking out, and finish one side before switching.
 
 touchdown_squat_dumbbell:
-  - name: DB Touchdown Squat
-    category: knee_stability
-    category_name: Knee Stability
-    side: true
-    requires: ["step_box", "dumbbell"]
-    cues: Hold one dumbbell in the hand opposite the working leg, control the descent, and switch sides after the set.
+  name: DB Touchdown Squat
+  side: true
+  requires: ["step_box", "dumbbell"]
+  cues: Hold one dumbbell in the hand opposite the working leg, control the descent, and switch sides after the set.
 
 touchdown_squat_kettlebell:
-  - name: KB Touchdown Squat
-    category: knee_stability
-    category_name: Knee Stability
-    side: true
-    requires: ["step_box", "kettlebell"]
-    cues: Hold one kettlebell in the hand opposite the working leg, touch the box softly, and complete one side at a time.
+  name: KB Touchdown Squat
+  side: true
+  requires: ["step_box", "kettlebell"]
+  cues: Hold one kettlebell in the hand opposite the working leg, touch the box softly, and complete one side at a time.
 
 wall_sit:
-  - name: Wall Sit
-    category: knee_strength
-    category_name: Knee Strength
-    side: false
-    cues: Thighs parallel to the floor, back flat on the wall, and breathe steadily through the hold.
+  name: Wall Sit
+  side: false
+  cues: Thighs parallel to the floor, back flat on the wall, and breathe steadily through the hold.

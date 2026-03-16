@@ -1,0 +1,126 @@
+posterior_chain_strength:
+  name: "Posterior Chain Strength"
+  description: "Build strength and resilience in the hamstrings, glutes and lower back — the primary drivers of running and cycling power and a key site of injury."
+  movements:
+    - deadlift_barbell
+    - deadlift_bodyweight
+    - deadlift_dumbbell
+    - deadlift_kettlebell
+    - rdl_barbell
+    - rdl_bodyweight
+    - rdl_dumbbell
+    - rdl_kettlebell
+    - glute_bridge
+    - glute_bridge_dumbbell
+    - glute_bridge_kettlebell
+
+knee_stability:
+  name: "Knee Stability"
+  description: "Strengthen the muscles that control knee tracking and lateral stability, reducing risk of runner's knee and IT band syndrome."
+  movements:
+    - touchdown_squat_bodyweight
+    - touchdown_squat_dumbbell
+    - touchdown_squat_kettlebell
+    - wall_sit
+    - squat_bodyweight
+
+hip_mobility_activation:
+  name: "Hip Mobility & Activation"
+  description: "Restore hip flexor range of motion and activate the glute med and hip rotators — addressing tightness and inhibition common in runners and desk workers."
+  movements:
+    - hip_flexor_lunge
+    - hip_90_90
+
+hip_flexor_strength:
+  name: "Hip Flexor Strength"
+  description: "Build active strength through the hip flexor complex to support the upstroke in cycling and improve hip drive across all activities."
+  movements:
+    - leg_lift
+    - single_leg_lift
+    - hollow_hold
+
+core_stability:
+  name: "Core Stability"
+  description: "Develop anti-rotation and bracing strength in the deep core and obliques — the running and cycling relevant kind, not flexion-based ab work."
+  movements:
+    - plank
+    - hollow_hold
+    - dead_bug
+    - bird_dog
+    - pallof_press
+
+single_leg_strength:
+  name: "Single-Leg Strength & Balance"
+  description: "Build unilateral strength and proprioception to expose and correct left-right asymmetries that bilateral exercises mask."
+  movements:
+    - bulgarian_split_bodyweight
+    - bulgarian_split_dumbbell
+    - bulgarian_split_kettlebell
+    - bulgarian_split_barbell
+    - step_up_bodyweight
+    - step_up_dumbbell
+    - step_up_kettlebell
+    - reverse_lunge_bodyweight
+    - reverse_lunge_dumbbell
+    - reverse_lunge_kettlebell
+    - reverse_lunge_barbell
+    - single_leg_deadlift_bodyweight
+    - single_leg_deadlift_dumbbell
+    - single_leg_deadlift_kettlebell
+
+upper_back_pull:
+  name: "Upper Back Pull"
+  description: "Strengthen the rhomboids, mid traps and rear delts through horizontal pulling — countering the forward-rounded posture that develops in runners, cyclists and desk workers."
+  movements:
+    - single_arm_row_dumbbell
+    - single_arm_row_kettlebell
+
+calf_achilles_stability:
+  name: "Calf & Achilles Complex"
+  description: "Build load tolerance in the calf and Achilles tendon through slow, controlled work — the specific stimulus the tendon needs to stay resilient."
+  movements:
+    - single_leg_calf_raise
+    - single_leg_calf_raise_dumbbell
+    - single_leg_calf_raise_kettlebell
+
+ankle_stability:
+  name: "Ankle Stability & Foot Mechanics"
+  description: "Strengthen the peroneals, tibialis anterior and intrinsic foot muscles to improve lateral ankle stability and foot strike mechanics."
+  movements:
+    - pogos
+    - single_leg_pogos
+
+quad_strength:
+  name: "Quad Strength & Power"
+  description: "Develop quad strength and explosive power for the push phase of cycling and general lower limb resilience."
+  movements:
+    - barbell_back_squat
+    - goblet_squat_dumbbell
+    - goblet_squat_kettlebell
+    - squat_bodyweight
+    - squat_jump
+    - wall_sit
+
+upper_back_push:
+  name: "Upper Back Push"
+  description: "Build horizontal pushing strength in the pecs, anterior deltoids and triceps — the pressing counterpart to rowing work for balanced upper body conditioning."
+  movements:
+    - push_up
+
+shoulder_stability_press:
+  name: "Shoulder Stability & Press"
+  description: "Develop overhead pressing strength and scapular stability in the deltoids, rotator cuff and serratus anterior — supporting injury resilience and posture under load."
+  movements:
+    - shoulder_press_dumbbell
+    - shoulder_press_kettlebell
+    - shoulder_press_single_arm_dumbbell
+    - shoulder_press_single_arm_kettlebell
+
+loaded_carries:
+  name: "Loaded Carries"
+  description: "Build total-body stability, grip strength and postural endurance through carrying exercises — an underused but highly transferable conditioning stimulus."
+  movements:
+    - farmers_carry_dumbbell
+    - farmers_carry_kettlebell
+    - suitcase_carry_dumbbell
+    - suitcase_carry_kettlebell

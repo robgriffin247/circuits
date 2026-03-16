@@ -1,66 +1,46 @@
-running_1:
-  - name: Runners Full Body Resilience
-    target_groups:
-      - target: core
-        movements:
-          - bird_dog
-          - dead_bug
-          - hollow_hold
-          - leg_lift
-          - pallof_press
-          - plank
-          - single_leg_lift
-      - target: knee_strength
-        movements:
-          - barbell_back_squat
-          - goblet_squat_dumbbell
-          - goblet_squat_kettlebell
-          - squat_bodyweight
-          - squat_jump
-          - step_up_bodyweight
-          - step_up_dumbbell
-          - step_up_kettlebell
-          - wall_sit
-      - target: ankle_stability
-        movements:
-          - pogos
-          - single_leg_calf_raise
-          - single_leg_calf_raise_dumbbell
-          - single_leg_pogos
-      - target: upper_back_strength
-        movements:
-          - push_up
-          - single_arm_row_dumbbell
-          - single_arm_row_kettlebell
-      - target: hip_mobility
-        movements:
-          - glute_bridge
-          - glute_bridge_dumbbell
-          - glute_bridge_kettlebell
-          - hip_90_90
-          - hip_flexor_lunge
-      - target: knee_stability
-        movements:
-          - bulgarian_split_barbell
-          - bulgarian_split_bodyweight
-          - bulgarian_split_dumbbell
-          - bulgarian_split_kettlebell
-          - reverse_lunge_barbell
-          - reverse_lunge_bodyweight
-          - reverse_lunge_dumbbell
-          - reverse_lunge_kettlebell
-          - touchdown_squat_bodyweight
-          - touchdown_squat_dumbbell
-          - touchdown_squat_kettlebell
-      - target: posterior_chain_strength
-        movements:
-          - deadlift_barbell
-          - deadlift_bodyweight
-          - deadlift_dumbbell
-          - deadlift_kettlebell
-          - rdl_barbell
-          - rdl_bodyweight
-          - rdl_dumbbell
-          - rdl_kettlebell
-    rotations: 3
-    max_sided_movements: 2
+running_injury_prevention:
+  name: "Runners Prehab & Mobility"
+  description: "Proactively build strength, stability and mobility to improve running technique and reduce injury risk."
+  rotations: 3
+  movement_duration: 40
+  rest_duration: 20
+  stations:
+    - posterior_chain_strength
+    - knee_stability
+    - hip_mobility_activation
+    - core_stability
+    - single_leg_strength
+    - upper_back_pull
+    - calf_achilles_stability
+    - ankle_stability
+
+cyclist_power_builder:
+  name: "Cyclists Power Builder"
+  description: "Build stability and power for explosive sprinting and short, high intensity efforts on the bike."
+  rotations: 3
+  movement_duration: 40
+  rest_duration: 20
+  stations:
+    - quad_strength
+    - posterior_chain_strength
+    - single_leg_strength
+    - core_stability
+    - hip_flexor_strength
+    - upper_back_pull
+    - knee_stability
+    - calf_achilles_stability
+
+whole_body_conditioner:
+  name: "Whole Body Conditioner"
+  description: "A whole body workout to build mobility and strength to prevent injury and improve conditioning."
+  rotations: 2
+  movement_duration: 60
+  rest_duration: 30
+  stations:
+    - core_stability
+    - posterior_chain_strength
+    - shoulder_stability_press
+    - upper_back_pull
+    - upper_back_push
+    - quad_strength
+    - loaded_carries
