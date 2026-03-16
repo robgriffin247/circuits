@@ -495,7 +495,18 @@ export default function App() {
     handleStart();
   };
 
-  const handleStartOver = () => {
+  const handleEndNow = () => {
+    clearIntervalTimer();
+    setStatus("stopped");
+    setHasFinished(true);
+    setStepIndex(Math.max(steps.length - 1, 0));
+    setTimeRemaining(0);
+    advancePendingRef.current = false;
+    endTimeRef.current = null;
+    lastRemainingRef.current = null;
+  };
+
+  const handleStartNewRoutine = () => {
     clearIntervalTimer();
     setStatus("idle");
     setHasFinished(false);
@@ -520,6 +531,10 @@ export default function App() {
       return;
     }
     const nextIndex = Math.min(Math.max(stepIndex + direction, 0), steps.length - 1);
+    if (hasFinished && direction < 0) {
+      setHasFinished(false);
+      setStatus("paused");
+    }
     setStepIndex(nextIndex);
     setTimeRemaining(steps[nextIndex]?.duration ?? 0);
     advancePendingRef.current = false;
@@ -771,6 +786,7 @@ export default function App() {
                 {EQUIPMENT_OPTIONS.map((item) => {
                   const pillClasses = ["pill"];
                   if (equipment[item.id]) pillClasses.push("active");
+                  if (isLocked) pillClasses.push("disabled");
 
                   return (
                     <label key={item.id} className={pillClasses.join(" ")}>
@@ -853,8 +869,8 @@ export default function App() {
                 <div className="session-footer">
                   {(status === "paused" || hasFinished) && (
                     <div className="session-action">
-                      <button className="ghost-button" type="button" onClick={handleStartOver}>
-                        Start over
+                      <button className="ghost-button" type="button" onClick={handleEndNow}>
+                        End your workout
                       </button>
                     </div>
                   )}
@@ -880,14 +896,28 @@ export default function App() {
                 <div className="flare flare-four" aria-hidden="true" />
                 <div className="flare flare-five" aria-hidden="true" />
                 <div className="flare flare-six" aria-hidden="true" />
-                <p className="label">Finished</p>
-                <h2>Finished!</h2>
-                <p className="sub-message cues">Circuit complete. Here&apos;s what you just worked through.</p>
+                <div className="flare flare-seven" aria-hidden="true" />
+                <div className="flare flare-eight" aria-hidden="true" />
+                <div className="flare flare-nine" aria-hidden="true" />
+                <div className="flare flare-ten" aria-hidden="true" />
+                <div className="flare flare-eleven" aria-hidden="true" />
+                <div className="flare flare-twelve" aria-hidden="true" />
+                <div className="flare flare-thirteen" aria-hidden="true" />
+                <div className="flare flare-fourteen" aria-hidden="true" />
+                <div className="flare flare-fifteen" aria-hidden="true" />
+                <div className="flare flare-sixteen" aria-hidden="true" />
+                <p className="label">Workout Complete</p>
+                <h2>Great work!</h2>
                 <ol className="finished-list">
                   {completedMovements.map((movementName, index) => (
                     <li key={`${movementName}-${index}`}>{movementName}</li>
                   ))}
                 </ol>
+                <div className="session-action">
+                  <button className="ghost-button" type="button" onClick={handleStartNewRoutine}>
+                    Start a new routine
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="panel-content">
