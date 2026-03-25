@@ -44,3 +44,18 @@ whole_body_conditioner:
     - upper_back_push
     - quad_strength
     - loaded_carries
+
+runners_isometric:
+  name: "Runners Bodyweight & Isometric"
+  description: "Bodyweight & isometric movements to improve running technique and reduce injury risk."
+  rotations: 3
+  movement_duration: 60
+  rest_duration: 30
+  movements:
+    - ["dead_bug", "bird_dog"]                        # deep core anti-extension
+    - ["plank", "hollow_hold", "side_plank"]          # core isometric holds
+    - ["leg_lift", "single_leg_lift"]                 # anterior core, hip flexor strength
+    - ["glute_bridge", "single_leg_deadlift_bodyweight"]  # posterior chain & glute
+    - ["copenhagen_plank", "side_plank"]              # adductors & lateral hip — critical for runners
+    - ["wall_sit", "squat_bodyweight", "squat_jump"]  # quad & glute — hold or dynamic
+    - ["single_leg_calf_raise", "single_leg_pogos"]   # soleus, Achilles, ankle stiffness

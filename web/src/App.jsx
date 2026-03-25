@@ -57,15 +57,31 @@ function buildRoutines(raw) {
   return Object.entries(raw ?? {}).map(([id, value]) => {
     const entry = Array.isArray(value) ? value[0] : value;
     const maxSidedMovements = Number(entry?.max_sided_movements);
-    const stations = entry?.stations ?? [];
     const movementDuration = Number(entry?.movement_duration);
     const restDuration = Number(entry?.rest_duration);
+    const groups = [];
+
+    const pushGroups = (items, type) => {
+      if (!Array.isArray(items)) return;
+
+      items.forEach((item) => {
+        const options = (Array.isArray(item) ? item : [item]).filter(
+          (option) => typeof option === "string" && option.length > 0
+        );
+
+        if (options.length === 0) return;
+        groups.push({ type, options });
+      });
+    };
+
+    pushGroups(entry?.stations, "station");
+    pushGroups(entry?.movements, "movement");
 
     return {
       id,
       name: entry?.name ?? id,
       description: entry?.description ?? "",
-      stations: stations ?? [],
+      groups,
       rotations: Number(entry?.rotations ?? 1),
       movementDuration: Number.isFinite(movementDuration) ? movementDuration : null,
       restDuration: Number.isFinite(restDuration) ? restDuration : null,
@@ -89,29 +105,58 @@ function meetsRequirements(requirements, equipmentSet) {
   });
 }
 
-function buildPlan(movementsById, stationsById, stationIds, equipmentSet, maxSidedMovements) {
+function getMovementCandidates(group, movementsById, stationsById) {
+  if (group?.type === "movement") {
+    return {
+      groupId: `movement-${group.options.join("-")}`,
+      groupName: "Movement",
+      movementIds: group.options
+    };
+  }
+
+  const selectedStationId = randomPick(group?.options ?? []);
+  const station = selectedStationId ? stationsById[selectedStationId] : null;
+
+  if (!selectedStationId || !station) {
+    return {
+      groupId: `station-${group?.options?.join("-") ?? "missing"}`,
+      groupName: "Station",
+      movementIds: [],
+      reason: "Station not found"
+    };
+  }
+
+  return {
+    groupId: station.id,
+    groupName: station.name || "Station",
+    movementIds: Array.isArray(station.movements) ? station.movements : []
+  };
+}
+
+function buildPlan(movementsById, stationsById, groups, equipmentSet, maxSidedMovements) {
   let sidedCount = 0;
 
-  return stationIds.map((stationId, index) => {
-    const station = stationsById[stationId];
-    if (!station) {
+  return (groups ?? []).map((group, index) => {
+    const candidateGroup = getMovementCandidates(group, movementsById, stationsById);
+
+    if (candidateGroup.reason) {
       return {
-        groupId: `station-${index}`,
-        groupName: "Station",
+        groupId: candidateGroup.groupId || `group-${index}`,
+        groupName: candidateGroup.groupName || "Group",
         movement: null,
         options: [],
         selectedIndex: -1,
-        reason: "Station not found"
+        reason: candidateGroup.reason
       };
     }
 
-    const movementIds = Array.isArray(station.movements) ? station.movements : [];
+    const movementIds = candidateGroup.movementIds;
     const candidates = movementIds.map((movementId) => movementsById[movementId]).filter(Boolean);
 
     if (candidates.length === 0) {
       return {
-        groupId: station.id,
-        groupName: station.name || "Station",
+        groupId: candidateGroup.groupId || `group-${index}`,
+        groupName: candidateGroup.groupName || "Group",
         movement: null,
         options: [],
         selectedIndex: -1,
@@ -123,8 +168,8 @@ function buildPlan(movementsById, stationsById, stationIds, equipmentSet, maxSid
 
     if (matching.length === 0) {
       return {
-        groupId: station.id,
-        groupName: station.name || "Station",
+        groupId: candidateGroup.groupId || `group-${index}`,
+        groupName: candidateGroup.groupName || "Group",
         movement: null,
         options: [],
         selectedIndex: -1,
@@ -136,8 +181,8 @@ function buildPlan(movementsById, stationsById, stationIds, equipmentSet, maxSid
 
     if (available.length === 0) {
       return {
-        groupId: station.id,
-        groupName: station.name || "Station",
+        groupId: candidateGroup.groupId || `group-${index}`,
+        groupName: candidateGroup.groupName || "Group",
         movement: null,
         options: [],
         selectedIndex: -1,
@@ -152,8 +197,8 @@ function buildPlan(movementsById, stationsById, stationIds, equipmentSet, maxSid
     }
 
     return {
-      groupId: station.id,
-      groupName: station.name || "Station",
+      groupId: candidateGroup.groupId || `group-${index}`,
+      groupName: candidateGroup.groupName || "Group",
       movement: selectedMovement,
       options: matching,
       selectedIndex,
@@ -422,7 +467,7 @@ export default function App() {
     const nextPlan = buildPlan(
       movementsById,
       stationsById,
-      routine.stations ?? [],
+      routine.groups ?? [],
       equipmentSet,
       routine.maxSidedMovements
     );

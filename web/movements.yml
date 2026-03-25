@@ -33,6 +33,12 @@ bulgarian_split_kettlebell:
   requires: ["step_box", "kettlebell"]
   cues: Hold one kettlebell in the hand opposite the front leg, stay stacked over the front foot, and complete one side at a time.
 
+copenhagen_plank:
+  name: Copenhagen Plank
+  side: true
+  requires: ["step_box"]
+  cues: Top foot on bench, bottom leg free, hips tall, don't rotate — one of the best adductor exercises for runners.
+
 dead_bug:
   name: Dead Bug
   side: false
@@ -268,6 +274,11 @@ single_leg_pogos:
   name: Single-Leg Pogo Jumps
   side: true
   cues: Minimal knee bend, stay stiff through the ankle, and complete one side before switching.
+
+side_plank:
+  name: Side Plank
+  side: true
+  cues: Hips stacked, don't let them sag, top hip slightly forward, complete one side before switching.
 
 squat_bodyweight:
   name: Squat
