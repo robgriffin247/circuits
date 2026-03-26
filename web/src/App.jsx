@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { load as loadYaml } from "js-yaml";
+import { Analytics } from "@vercel/analytics/react";
 import movementsYamlText from "../movements.yml?raw";
 import routinesYamlText from "../routines.yml?raw";
 import stationsYamlText from "../stations.yml?raw";
@@ -1020,6 +1021,7 @@ export default function App() {
           </div>
         </section>
       </main>
+      <Analytics />
     </div>
   );
 }
